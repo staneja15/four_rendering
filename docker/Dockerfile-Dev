@@ -1,0 +1,44 @@
+FROM dev_base
+
+WORKDIR /tmp
+
+# Install Catch2 (cpp testing framework)
+RUN git clone https://github.com/catchorg/Catch2.git && \
+    cd Catch2 && \
+    cmake -B build -S . -DBUILD_TESTING=OFF && \
+    cmake --build build/ --target install
+RUN rm -r Catch2
+
+
+# Install Vulkan
+ENV VULKAN_VERSION=1.4.309.0
+RUN mkdir /vulkan && cd /vulkan && \
+    wget https://sdk.lunarg.com/sdk/download/1.4.309.0/linux/vulkansdk-linux-x86_64-${VULKAN_VERSION}.tar.xz && \
+    tar -xvf vulkansdk-linux-x86_64-${VULKAN_VERSION}.tar.xz
+
+ENV VULKAN_SDK=/vulkan/${VULKAN_VERSION}/x86_64
+ENV PATH=${VULKAN_SDK}/bin:${PATH}
+ENV LD_LIBRARY_PATH=$VULKAN_SDK/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+ENV VULKAN_LAYER_PATH=${VULKAN_SDK}/share/vulkan/explicit_layer.d
+
+RUN cp -r $VULKAN_SDK/include/vulkan/ /usr/local/include/
+RUN cp -r $VULKAN_SDK/include/vk_video/ /usr/local/include/
+RUN cp -P $VULKAN_SDK/lib/libvulkan.so* /usr/local/lib/
+RUN cp $VULKAN_SDK/lib/libVkLayer_*.so /usr/local/lib/
+RUN mkdir -p /usr/local/share/vulkan/explicit_layer.d
+RUN cp $VULKAN_SDK/share/vulkan/explicit_layer.d/VkLayer_*.json /usr/local/share/vulkan/explicit_layer.d
+
+RUN apt update && apt upgrade -y && apt install -y \
+    libxcb-xinput0  \
+    libxcb-xinerama0  \
+    libxcb-cursor-dev \
+    libwayland-dev \
+    libegl1
+
+# Install GLM and GLFW - matrix math library and window manager
+RUN apt update && apt install -y \
+    libglfw3-dev \
+    libglm-dev
+
+# Remove any ICDs that are not needed - they can cause errors
+RUN rm /usr/share/vulkan/icd.d/*

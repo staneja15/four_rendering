@@ -1,0 +1,32 @@
+FROM ubuntu:22.04
+
+WORKDIR /tmp
+
+ENV NVIDIA_DRIVER_CAPABILITIES=all
+ENV NVIDIA_VISIBLE_DEVICES=all
+
+# Install essential libs
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    gdb \
+    ninja-build \
+    libssl-dev \
+    make \
+    git \
+    wget
+
+# Install CMake
+ENV CMAKE_VERSION=3.26.1
+ENV CMAKE_MAJOR_VERSION=3.26
+RUN wget https://cmake.org/files/v${CMAKE_MAJOR_VERSION}/cmake-${CMAKE_VERSION}.tar.gz && \
+    tar xvzf cmake-${CMAKE_VERSION}.tar.gz && \
+    rm cmake-${CMAKE_VERSION}.tar.gz
+
+RUN cd cmake-${CMAKE_VERSION} && \
+    ./configure --prefix=/opt/cmake && \
+    make -j 6 && \
+    make install && \
+    ln -s /opt/cmake/bin/cmake /usr/bin/cmake
+
+RUN rm -r /tmp/cmake-${CMAKE_VERSION}

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BackendCodeEditorMiscSettings">
+    <option name="/Default/RiderDebugger/RiderRestoreDecompile/RestoreDecompileSetting/@EntryValue" value="false" type="bool" />
+    <option name="/Default/Housekeeping/GlobalSettingsUpgraded/IsUpgraded/@EntryValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/FeatureSuggestion/FeatureSuggestionManager/DisabledSuggesters/=SwitchToGoToActionSuggester/@EntryIndexedValue" value="true" type="bool" />
+    <option name="/Default/Housekeeping/OptionsDialog/SelectedPageId/@EntryValue" value="CppFormatterOtherPage" type="string" />
+    <option name="/Default/Environment/Hierarchy/GeneratedFilesCacheKey/Timestamp/@EntryValue" value="13" type="long" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeProjectFlavorService">
+    <option name="flavorId" value="CMakePlainProjectFlavor" />
+  </component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated>
+      <config projectName="four_rendering" targetName="camera" />
+      <config projectName="four_rendering" targetName="drawing" />
+      <config projectName="four_rendering" targetName="builders" />
+      <config projectName="four_rendering" targetName="shaders" />
+      <config projectName="four_rendering" targetName="window" />
+      <config projectName="four_rendering" targetName="four_rendering_test" />
+      <config projectName="four_rendering" targetName="four-rendering_test" />
+      <config projectName="four_rendering" targetName="four-rendering_run" />
+      <config projectName="four_rendering" targetName="four_rendering_run" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug-Docker" ENABLED="true" GENERATION_DIR="build/build-debug" CONFIG_NAME="Debug" TOOLCHAIN_NAME="Docker" />
+      <configuration PROFILE_NAME="Release-Docker" ENABLED="true" GENERATION_DIR="build/build-release" CONFIG_NAME="Release" TOOLCHAIN_NAME="Docker" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="21b432c3-a816-4e0f-80c4-5a6fa6842860" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/builders/cpp/vulkan_builder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/builders/cpp/vulkan_builder.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/builders/vulkan_builder.h" beforeDir="false" afterPath="$PROJECT_DIR$/builders/vulkan_builder.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/builders/vulkan_structures.h" beforeDir="false" afterPath="$PROJECT_DIR$/builders/vulkan_structures.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/camera/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/camera/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_application.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sample_application.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample_application.h" beforeDir="false" afterPath="$PROJECT_DIR$/sample_application.h" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="clangTidyViaClangd" value="false" />
+    <option name="indexerUseModules" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug-Docker" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.cache/JetBrains/CLion2024.2/.docker/2024_2/Docker/dev_latest/usr/include/vulkan/vulkan_structs.hpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/builders/cpp/vulkan_builder.cpp" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2024" />
+    <option name="minorVersion" value="2.4" />
+    <option name="productBranch" value="Classic" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2wNbFTTeC9hXbSpNMoxqQSlUnSp" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "CMake Application.four-rendering_run.executor": "Run",
+    "CMake Application.four_rendering_run.executor": "Run",
+    "Docker.docker/Dockerfile-Dev.executor": "Run",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "hello__triangle",
+    "last_opened_file_path": "/home/sunny/projects/vulkan_tutorial",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "CMakeSettings",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
+    ]
+  }
+}]]></component>
+  <component name="RunManager" selected="CMake Application.four_rendering_run">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="builders" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="builders" CONFIG_NAME="Debug-Docker">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="camera" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="camera" CONFIG_NAME="Debug-Docker">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="drawing" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="drawing" CONFIG_NAME="Debug-Docker">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="four_rendering_run" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="four_rendering_run" CONFIG_NAME="Debug-Docker" RUN_TARGET_PROJECT_NAME="four_rendering" RUN_TARGET_NAME="four_rendering_run">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="four_rendering_test" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="four_rendering_test" CONFIG_NAME="Debug-Docker" RUN_TARGET_PROJECT_NAME="four_rendering" RUN_TARGET_NAME="four_rendering_test">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="shaders" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="shaders" CONFIG_NAME="Debug-Docker">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="window" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="four_rendering" TARGET_NAME="window" CONFIG_NAME="Debug-Docker">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker/Dockerfile-Dev-Base" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="dev-base" />
+          <option name="containerName" value="" />
+          <option name="sourceFilePath" value="docker/Dockerfile-Dev-Base" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker/Dockerfile-Dev" type="docker-deploy" factoryName="dockerfile" temporary="true" server-name="Docker">
+      <deployment type="dockerfile">
+        <settings>
+          <option name="imageTag" value="dev" />
+          <option name="buildOnly" value="true" />
+          <option name="containerName" value="" />
+          <option name="sourceFilePath" value="docker/Dockerfile-Dev" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.four_rendering_run" />
+      <item itemvalue="CMake Application.four_rendering_test" />
+      <item itemvalue="CMake Application.builders" />
+      <item itemvalue="CMake Application.camera" />
+      <item itemvalue="CMake Application.drawing" />
+      <item itemvalue="CMake Application.shaders" />
+      <item itemvalue="CMake Application.window" />
+      <item itemvalue="Docker.docker/Dockerfile-Dev" />
+      <item itemvalue="Docker.docker/Dockerfile-Dev-Base" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Docker.docker/Dockerfile-Dev" />
+        <item itemvalue="Docker.docker/Dockerfile-Dev-Base" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="21b432c3-a816-4e0f-80c4-5a6fa6842860" name="Changes" comment="" />
+      <created>1745884874499</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1745884874499</updated>
+      <workItem from="1745884875532" duration="22031000" />
+      <workItem from="1745970063816" duration="26416000" />
+      <workItem from="1746087823016" duration="24979000" />
+      <workItem from="1746167658135" duration="35659000" />
+      <workItem from="1746669257731" duration="99000" />
+      <workItem from="1746674637959" duration="2014000" />
+      <workItem from="1746676698921" duration="53000" />
+      <workItem from="1746676757145" duration="9950000" />
+      <workItem from="1746736231214" duration="82000" />
+      <workItem from="1746736318974" duration="40000" />
+      <workItem from="1746736363445" duration="72000" />
+      <workItem from="1746736440205" duration="68000" />
+      <workItem from="1746736526618" duration="22000" />
+      <workItem from="1746736571566" duration="169000" />
+      <workItem from="1746752161553" duration="590000" />
+      <workItem from="1746918975848" duration="53000" />
+      <workItem from="1746919034887" duration="3984000" />
+      <workItem from="1747180162411" duration="571000" />
+      <workItem from="1747180738516" duration="14504000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VCPKGProject">
+    <isAutomaticCheckingOnLaunch value="false" />
+    <isAutomaticFoundErrors value="true" />
+    <isAutomaticReloadCMake value="true" />
+  </component>
+</project>

@@ -1,19 +1,72 @@
 #pragma once
 
-#include <window/GLFW_window.h>
+#include "window/GLFW_window.h"
+#include "camera/camera.h"
 
 #include <vector>
 #include <memory>
 
 #include <vulkan/vulkan.h>
 
-struct SurfaceProperties {
-	VkSurfaceCapabilitiesKHR capabilities;
-	VkSurfaceFormatKHR       format;
+struct BufferCore {
+	VkDevice* device             = VK_NULL_HANDLE;
+	VkBuffer  buffer             = VK_NULL_HANDLE;
+	VkDeviceMemory buffer_memory = VK_NULL_HANDLE;
+	std::uint32_t count          = 0;
+	void* data                   = nullptr;
+
+	explicit BufferCore(VkDevice* device_in)
+		: device(device_in)
+	{ }
+
+	~BufferCore() {
+		destroy();
+	}
+
+	void destroy() {
+		if (buffer != VK_NULL_HANDLE) {
+			vkDestroyBuffer(*device, buffer, nullptr);
+			buffer = VK_NULL_HANDLE;
+		}
+
+		if (buffer_memory != VK_NULL_HANDLE) {
+			vkFreeMemory(*device, buffer_memory, nullptr);
+			buffer_memory = VK_NULL_HANDLE;
+		}
+	}
 };
 
-struct Extensions {
-	PFN_vkCmdSetPolygonModeEXT polygon_mode = VK_NULL_HANDLE;
+struct DescriptorCore {
+	VkDevice* device                            = VK_NULL_HANDLE;
+	VkDescriptorPool pool                       = VK_NULL_HANDLE;
+	std::uint32_t pool_size                     =  0;
+	VkDescriptorSetLayout layout                = VK_NULL_HANDLE;
+	std::vector<VkDescriptorSet> descriptors    = {};
+	std::vector<BufferCore> buffers             = {};
+
+	explicit DescriptorCore(VkDevice* device_in)
+		: device(device_in)
+	{ }
+
+	~DescriptorCore() {
+		destroy();
+	}
+
+	void destroy() {
+		if (layout != VK_NULL_HANDLE) {
+			vkDestroyDescriptorSetLayout(*device, layout, nullptr);
+			layout = VK_NULL_HANDLE;
+		}
+
+		if (pool != VK_NULL_HANDLE) {
+			vkDestroyDescriptorPool(*device, pool, nullptr);
+			pool = VK_NULL_HANDLE;
+		}
+
+		if (!buffers.empty()) {
+			buffers.clear();
+		}
+	}
 };
 
 struct SwapChainDimensions {
@@ -25,6 +78,15 @@ struct SwapChainDimensions {
 
 	/// Pixel format of the swap chain.
 	VkFormat format = VK_FORMAT_UNDEFINED;
+};
+
+struct SurfaceProperties {
+	VkSurfaceCapabilitiesKHR capabilities;
+	VkSurfaceFormatKHR       format;
+};
+
+struct Extensions {
+	PFN_vkCmdSetPolygonModeEXT polygon_mode = VK_NULL_HANDLE;
 };
 
 struct PerFrame {
@@ -90,11 +152,14 @@ struct VkContext {
     /// A set of per-frame data.
     std::vector<PerFrame> per_frame;
 
-    /// The Vulkan buffer object that holds the vertex data for the triangle.
-    VkBuffer vertex_buffer = VK_NULL_HANDLE;
+	/// The descriptor object that holds the Model/View/Projection data.
+	DescriptorCore mvp = DescriptorCore(&device);
 
-    /// The device memory allocated for the vertex buffer.
-    VkDeviceMemory vertex_buffer_memory = VK_NULL_HANDLE;
+    /// The buffer object that holds the vertex data and memory for the triangle.
+    BufferCore vertex_buffer = BufferCore(&device);
+
+	/// The buffer object that holds the indices data and memory for the triangle.
+	BufferCore indices_buffer = BufferCore(&device);
 
 	void teardown_per_frame(PerFrame& per_frame) {
 		if (per_frame.queue_submit_fence != VK_NULL_HANDLE) {
@@ -139,15 +204,10 @@ struct VkContext {
 		}
 		recycled_semaphores.clear();
 
-		if (vertex_buffer != VK_NULL_HANDLE) {
-			vkDestroyBuffer(device, vertex_buffer, nullptr);
-			vertex_buffer = VK_NULL_HANDLE;
-		}
+		mvp.destroy();
 
-		if (vertex_buffer_memory != VK_NULL_HANDLE) {
-			vkFreeMemory(device, vertex_buffer_memory, nullptr);
-			vertex_buffer_memory = VK_NULL_HANDLE;
-		}
+		vertex_buffer.destroy();
+		indices_buffer.destroy();
 
 		if (pipeline != VK_NULL_HANDLE) {
 			vkDestroyPipeline(device, pipeline, nullptr);

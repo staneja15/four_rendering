@@ -277,7 +277,7 @@ namespace fr {
 
         VkCommandPoolCreateInfo cmd_pool_info {
             .sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
-            .flags            = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+            .flags            = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT,
             .queueFamilyIndex = static_cast<uint32_t>(_context->graphics_queue_index)
         };
         validate(

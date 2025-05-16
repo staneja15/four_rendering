@@ -1,5 +1,9 @@
 #include "drawing/renderer.h"
+#include "drawing/descriptor_set_types.h"
+#include "camera/camera.h"
 #include "utils/error.h"
+
+#include <glm/glm.hpp>
 
 namespace fr {
     Renderer::Renderer(std::shared_ptr<VkContext>& context)
@@ -104,8 +108,13 @@ namespace fr {
         _context->extensions.polygon_mode(cmd, VK_POLYGON_MODE_FILL);
 
         VkDeviceSize offset = {0};
-        vkCmdBindVertexBuffers(cmd, 0, 1, &_context->vertex_buffer, &offset);
-        vkCmdDraw(cmd, vertices_size, 1, 0, 0);
+        vkCmdBindVertexBuffers(cmd, 0, 1, &_context->vertex_buffer.buffer, &offset);
+        vkCmdBindIndexBuffer(cmd, _context->indices_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        std::uint32_t dynamic_offset = sizeof(MVP);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->mvp.descriptors[index], 0, nullptr);
+
+        vkCmdDrawIndexed(cmd, _context->indices_buffer.count, 1, 0, 0, 0);
 
         // Complete rendering
         vkCmdEndRendering(cmd);
@@ -135,6 +144,9 @@ namespace fr {
                 "Failed to create release semaphore."
             );
         }
+
+        // Update MVP descriptor set
+        MVP::update(_context->mvp.buffers[index].data, _context->swap_chain_dimensions);
 
         // Use top of pipe bit to ensure that no parts of the pipeline execute until the swap chain image is
         //      acquired (signalled by the acquire_semaphore).

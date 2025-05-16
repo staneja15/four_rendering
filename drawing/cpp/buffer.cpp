@@ -1,31 +1,31 @@
-#include "drawing/vertex_buffer.h"
+#include "drawing/buffer.h"
 
 #include <ranges>
 
 #include "utils/error.h"
 
 namespace fr {
-    VertexBuffer::VertexBuffer(std::shared_ptr<VkContext>& context)
+    Buffer::Buffer(std::shared_ptr<VkContext>& context)
         : _context(context)
     { }
 
-    void VertexBuffer::create_vertex_buffer(void* vertices, VkDeviceSize buffer_size) {
+    void Buffer::create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, const VkBufferUsageFlags usage, bool unmap) {
         // Create the buffer
         VkBufferCreateInfo vertex_buffer_info {
             .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
             .flags       = 0,
             .size        = buffer_size,
-            .usage       = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+            .usage       = usage,
             .sharingMode = VK_SHARING_MODE_EXCLUSIVE
         };
         validate(
-            vkCreateBuffer(_context->device, &vertex_buffer_info, nullptr, &_context->vertex_buffer),
+            vkCreateBuffer(_context->device, &vertex_buffer_info, nullptr, &buffer.buffer),
             "Failed to create vertex buffer."
         );
 
         // Get memory requirements
         VkMemoryRequirements memory_requirements;
-        vkGetBufferMemoryRequirements(_context->device, _context->vertex_buffer, &memory_requirements);
+        vkGetBufferMemoryRequirements(_context->device, buffer.buffer, &memory_requirements);
 
         // Allocate memory to the buffer
         // todo: We should map this to device local memory
@@ -40,27 +40,29 @@ namespace fr {
         };
 
         validate(
-            vkAllocateMemory(_context->device, &alloc_info, nullptr, &_context->vertex_buffer_memory),
+            vkAllocateMemory(_context->device, &alloc_info, nullptr, &buffer.buffer_memory),
             "Failed to allocate vertex buffer memory."
         );
 
         // Bind the buffer with the allocated memory
         validate(
-            vkBindBufferMemory(_context->device, _context->vertex_buffer, _context->vertex_buffer_memory, 0),
+            vkBindBufferMemory(_context->device, buffer.buffer, buffer.buffer_memory, 0),
             "Failed to bind vertex buffer memory."
         );
 
         // Map the memory and copy the vertex data
-        void* data;
         validate(
-            vkMapMemory(_context->device, _context->vertex_buffer_memory, 0, buffer_size, 0, &data),
+            vkMapMemory(_context->device, buffer.buffer_memory, 0, buffer_size, 0, &buffer.data),
             "Failed to Map the vertex buffer memory."
         );
-        memcpy(data, vertices, static_cast<std::size_t>(buffer_size));
-        vkUnmapMemory(_context->device, _context->vertex_buffer_memory);
+        memcpy(buffer.data, vertices, static_cast<std::size_t>(buffer_size));
+
+        if (unmap) {
+            vkUnmapMemory(_context->device, buffer.buffer_memory);
+        }
     }
 
-    std::uint32_t VertexBuffer::_find_memory_type(VkPhysicalDevice physical_device, uint32_t type_filter, VkMemoryPropertyFlags properties) {
+    std::uint32_t Buffer::_find_memory_type(VkPhysicalDevice physical_device, uint32_t type_filter, VkMemoryPropertyFlags properties) {
         // Structure to hold the physical device's memory properties
         VkPhysicalDeviceMemoryProperties mem_properties;
         vkGetPhysicalDeviceMemoryProperties(physical_device, &mem_properties);

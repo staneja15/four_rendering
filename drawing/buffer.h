@@ -3,11 +3,11 @@
 #include "builders/vulkan_structures.h"
 
 namespace fr {
-    class VertexBuffer {
+    class Buffer {
     public:
-        VertexBuffer(std::shared_ptr<VkContext>& context);
+        Buffer(std::shared_ptr<VkContext>& context);
 
-        void create_vertex_buffer(void* vertices, VkDeviceSize buffer_size);
+        void create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, VkBufferUsageFlags usage, bool unmap);
 
     private:
         std::shared_ptr<VkContext> _context;

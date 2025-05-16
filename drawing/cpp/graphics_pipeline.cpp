@@ -9,7 +9,9 @@ fr::GraphicsPipeline::GraphicsPipeline(std::shared_ptr<VkContext>& context)
 void fr::GraphicsPipeline::create_pipeline(const VertexInfo& vertex_info, std::vector<VkPipelineShaderStageCreateInfo>& shader_stages) {
     // Create a dynamic pipeline
     VkPipelineLayoutCreateInfo pipeline_layout_info {
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount = 1,
+        .pSetLayouts = &_context->mvp.layout
     };
     validate(
         vkCreatePipelineLayout(_context->device, &pipeline_layout_info, nullptr, &_context->pipeline_layout),

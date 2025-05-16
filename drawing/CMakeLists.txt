@@ -5,11 +5,18 @@ add_library(
     STATIC
     cpp/graphics_pipeline.cpp
     cpp/renderer.cpp
-    cpp/vertex_buffer.cpp
+    cpp/buffer.cpp
+    cpp/descriptor_set.cpp
 )
 
 target_include_directories(
     ${target}
     PRIVATE
     ${PROJECT_SOURCE_DIR}
+)
+
+target_link_libraries(
+    ${target}
+    PRIVATE
+    camera
 )

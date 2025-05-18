@@ -9,6 +9,8 @@ namespace fr {
 
         void create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, VkBufferUsageFlags usage, bool unmap);
 
+        std::size_t calculate_dynamic_alignment(std::size_t size) const;
+
     private:
         std::shared_ptr<VkContext> _context;
 

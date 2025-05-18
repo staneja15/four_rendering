@@ -111,10 +111,13 @@ namespace fr {
         vkCmdBindVertexBuffers(cmd, 0, 1, &_context->vertex_buffer.buffer, &offset);
         vkCmdBindIndexBuffer(cmd, _context->indices_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
-        std::uint32_t dynamic_offset = sizeof(MVP);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->mvp.descriptors[index], 0, nullptr);
 
-        vkCmdDrawIndexed(cmd, _context->indices_buffer.count, 1, 0, 0, 0);
+        for (int i = 0; i < _context->descriptor.dynamic_buffer.n_buffers; ++i) {
+            auto dynamic_offset = i * static_cast<std::uint32_t>(_context->descriptor.dynamic_buffer.dynamic_alignment);
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->descriptor.descriptor, 1, &dynamic_offset);
+
+            vkCmdDrawIndexed(cmd, _context->indices_buffer.count, 1, 0, 0, 0);
+        }
 
         // Complete rendering
         vkCmdEndRendering(cmd);
@@ -144,9 +147,6 @@ namespace fr {
                 "Failed to create release semaphore."
             );
         }
-
-        // Update MVP descriptor set
-        MVP::update(_context->mvp.buffers[index].data, _context->swap_chain_dimensions);
 
         // Use top of pipe bit to ensure that no parts of the pipeline execute until the swap chain image is
         //      acquired (signalled by the acquire_semaphore).

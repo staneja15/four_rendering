@@ -1,0 +1,27 @@
+services:
+    fr:
+        image: dev:latest
+        working_dir: "/opt/four_rendering"
+        privileged: true
+        volumes:
+            - ./:/opt/four_rendering
+            - /tmp/.X11-unix:/tmp/.X11-unix  # Give container access to host display
+            - /usr/share/vulkan/icd.d/nvidia_icd.json:/usr/share/vulkan/icd.d/nvidia_icd.json  # todo: workout how to do the equivalent of --runtime=nvidia because nvidia.icd.json doesn't get loaded properly with docker compose
+        environment:
+            DISPLAY: $DISPLAY
+
+        # Enable GPU
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - driver: nvidia
+                          capabilities: [ gpu ]
+                          count: 1
+
+    # Launches the render doc application, extending the base fr service layout
+    fr_render_doc:
+        image: dev:latest
+        extends:
+            service: fr
+        entrypoint: ["/opt/renderdoc/bin/qrenderdoc"]

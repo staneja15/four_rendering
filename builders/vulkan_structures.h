@@ -9,11 +9,14 @@
 #include <vulkan/vulkan.h>
 
 struct BufferCore {
-	VkDevice* device             = VK_NULL_HANDLE;
-	VkBuffer  buffer             = VK_NULL_HANDLE;
-	VkDeviceMemory buffer_memory = VK_NULL_HANDLE;
-	std::uint32_t count          = 0;
-	void* data                   = nullptr;
+	VkDevice* device              = VK_NULL_HANDLE;
+	VkBuffer  buffer              = VK_NULL_HANDLE;
+	VkDeviceMemory buffer_memory  = VK_NULL_HANDLE;
+	std::uint32_t count           = 0;
+	std::size_t size              = 0;
+	std::size_t dynamic_alignment = 0;
+	std::size_t n_buffers         = 0;
+	void* data                    = nullptr;
 
 	explicit BufferCore(VkDevice* device_in)
 		: device(device_in)
@@ -41,11 +44,14 @@ struct DescriptorCore {
 	VkDescriptorPool pool                       = VK_NULL_HANDLE;
 	std::uint32_t pool_size                     =  0;
 	VkDescriptorSetLayout layout                = VK_NULL_HANDLE;
-	std::vector<VkDescriptorSet> descriptors    = {};
-	std::vector<BufferCore> buffers             = {};
+	VkDescriptorSet descriptor                  = VK_NULL_HANDLE;
+	BufferCore uniform_buffer                   ;
+	BufferCore dynamic_buffer                   ;
 
 	explicit DescriptorCore(VkDevice* device_in)
 		: device(device_in)
+		, uniform_buffer(BufferCore(device_in))
+		, dynamic_buffer(BufferCore(device_in))
 	{ }
 
 	~DescriptorCore() {
@@ -63,9 +69,8 @@ struct DescriptorCore {
 			pool = VK_NULL_HANDLE;
 		}
 
-		if (!buffers.empty()) {
-			buffers.clear();
-		}
+		uniform_buffer.destroy();
+		dynamic_buffer.destroy();
 	}
 };
 
@@ -153,7 +158,7 @@ struct VkContext {
     std::vector<PerFrame> per_frame;
 
 	/// The descriptor object that holds the Model/View/Projection data.
-	DescriptorCore mvp = DescriptorCore(&device);
+	DescriptorCore descriptor = DescriptorCore(&device);
 
     /// The buffer object that holds the vertex data and memory for the triangle.
     BufferCore vertex_buffer = BufferCore(&device);
@@ -204,7 +209,7 @@ struct VkContext {
 		}
 		recycled_semaphores.clear();
 
-		mvp.destroy();
+		descriptor.destroy();
 
 		vertex_buffer.destroy();
 		indices_buffer.destroy();

@@ -10,6 +10,8 @@ namespace fr {
     { }
 
     void Buffer::create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, const VkBufferUsageFlags usage, bool unmap) {
+        buffer.size = buffer_size;
+
         // Create the buffer
         VkBufferCreateInfo vertex_buffer_info {
             .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -60,6 +62,22 @@ namespace fr {
         if (unmap) {
             vkUnmapMemory(_context->device, buffer.buffer_memory);
         }
+    }
+
+    std::size_t Buffer::calculate_dynamic_alignment(const std::size_t size) const {
+        std::size_t dynamic_alignment = size;
+
+        // Get physical device properties
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(_context->gpu, &properties);
+
+        // Set the dynamic alignment
+        std::uint32_t min_ubo_alignment = properties.limits.minUniformBufferOffsetAlignment;
+        if (min_ubo_alignment > 0) {
+            dynamic_alignment = (dynamic_alignment + min_ubo_alignment - 1) & ~(min_ubo_alignment - 1);
+        }
+
+        return dynamic_alignment;
     }
 
     std::uint32_t Buffer::_find_memory_type(VkPhysicalDevice physical_device, uint32_t type_filter, VkMemoryPropertyFlags properties) {

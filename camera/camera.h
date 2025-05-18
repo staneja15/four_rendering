@@ -7,7 +7,7 @@ namespace fr {
     class Camera {
     public:
         static inline float speed = 5.0f;
-        static inline glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+        static inline glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 7.0f);
         static inline glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
         static inline glm::vec3 camera_direction = glm::normalize(camera_pos - target); // z-axis
         static inline glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);

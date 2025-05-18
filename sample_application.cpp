@@ -46,18 +46,33 @@ void SampleApplication::set_uniforms() {
     buffer.create_buffer(_context->indices_buffer, indices.data(),  sizeof(indices[0])  * indices.size(),  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,  true);
 
     // Create descriptor sets
-    const std::uint32_t n_descriptors = _context->per_frame.size();
-    _context->mvp.buffers.reserve(n_descriptors);
+    auto data = nullptr;  // Bind no data to begin with - we will update this in the main loop later.
+    _context->descriptor.dynamic_buffer.dynamic_alignment = buffer.calculate_dynamic_alignment(sizeof(glm::mat4));
+    _context->descriptor.dynamic_buffer.n_buffers = 3;
+    buffer.create_buffer(_context->descriptor.uniform_buffer, &data, sizeof(fr::ViewProj), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, false);
+    buffer.create_buffer(_context->descriptor.dynamic_buffer, &data, _context->descriptor.dynamic_buffer.dynamic_alignment * _context->descriptor.dynamic_buffer.n_buffers, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, false);
 
-    auto data = fr::MVP {};
-    for (int i = 0; i < n_descriptors; ++i) {
-        // Initialise a descriptor set for each frame
-        _context->mvp.buffers.emplace_back(&_context->device);
-        buffer.create_buffer(_context->mvp.buffers[i], &data, sizeof(fr::MVP), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, false);
-    }
+    std::vector<fr::DescriptorInfo> infos = {
+        fr::DescriptorInfo(
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            VK_SHADER_STAGE_VERTEX_BIT,
+            0,
+            sizeof(fr::ViewProj),
+            _context->descriptor.uniform_buffer.buffer,
+            0
+        ),
+        fr::DescriptorInfo(
+            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
+            VK_SHADER_STAGE_VERTEX_BIT,
+            1,
+            _context->descriptor.dynamic_buffer.dynamic_alignment,
+            _context->descriptor.dynamic_buffer.buffer,
+            0
+        )
+    };
 
     auto descriptor_set = fr::DescriptorSet(_context);
-    descriptor_set.create_descriptor_sets(_context->mvp, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, sizeof(fr::MVP), 0);
+    descriptor_set.create_descriptor_sets(_context->descriptor, infos);
 }
 
 void SampleApplication::run() {
@@ -73,5 +88,14 @@ void SampleApplication::run() {
             _vulkan_builder->recreate_swap_chain();
             renderer.record_command_buffer(vertices.size());
         }
+
+        // Update MVP descriptor set
+        fr::ViewProj::update(_context->descriptor.uniform_buffer.data, _context->swap_chain_dimensions);
+        fr::dynamic::Model::update(
+            _context->descriptor.dynamic_buffer.data,
+            _context->descriptor.dynamic_buffer.dynamic_alignment,
+            _context->descriptor.dynamic_buffer.size,
+            _context->descriptor.dynamic_buffer.n_buffers
+        );
     }
 }

@@ -34,8 +34,8 @@ namespace fr {
     }
 
     void Shader::_read_shader_file() {
-        std::vector<char> vertex_shader_code = file_system::read_binary_file(shader_dir + "basic.spv");
-        std::vector<char> fragment_shader_code = file_system::read_binary_file(shader_dir + "basic.spv");
+        std::vector<char> vertex_shader_code = file_system::read_binary_file(shader_dir + _shader_name + ".spv");
+        std::vector<char> fragment_shader_code = file_system::read_binary_file(shader_dir + _shader_name + ".spv");
 
         _vertex_shader_module = _create_shader_module(vertex_shader_code);
         _fragment_shader_module = _create_shader_module(fragment_shader_code);

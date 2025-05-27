@@ -8,7 +8,7 @@
 namespace fr {
     class Shader {
     public:
-        std::string shader_dir = "/opt/four_rendering/shaders/spirv/";
+        std::string shader_dir = "/opt/four_map_engine/four_rendering/shaders/spirv/";
 
         explicit Shader(std::string shader_name, const VkDevice& device);
 

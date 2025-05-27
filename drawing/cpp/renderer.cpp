@@ -10,7 +10,7 @@ namespace fr {
         : _context(context)
     { }
 
-    bool Renderer::record_command_buffer(std::size_t vertices_size) {
+    bool Renderer::record_command_buffer(std::size_t vertices_size, const RendererParams& renderer_params) {
         std::uint32_t index = 0;
         auto res = _acquire_next_swap_chain_image(&index);
 
@@ -105,7 +105,7 @@ namespace fr {
         vkCmdSetFrontFace(cmd, VK_FRONT_FACE_CLOCKWISE);
         vkCmdSetPrimitiveTopology(cmd, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
-        _context->extensions.polygon_mode(cmd, VK_POLYGON_MODE_FILL);
+        _context->extensions.polygon_mode(cmd, renderer_params.polygon_mode);
 
         VkDeviceSize offset = {0};
         vkCmdBindVertexBuffers(cmd, 0, 1, &_context->vertex_buffer.buffer, &offset);

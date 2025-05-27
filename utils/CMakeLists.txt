@@ -1,4 +1,4 @@
-set(target utils)
+set(target fr_utils)
 
 add_library(
     ${target}
@@ -9,5 +9,5 @@ add_library(
 target_include_directories(
     ${target}
     PRIVATE
-    ${PROJECT_SOURCE_DIR}
+    ${FR_ROOT_DIR}
 )

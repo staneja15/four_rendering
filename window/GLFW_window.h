@@ -20,7 +20,7 @@ namespace fr {
 
         static void framebuffer_resize_callback(GLFWwindow* window, int width, int height);
 
-        static void process_input(GLFWwindow *window);
+        static void process_input(GLFWwindow *window, VkPolygonMode& polygon_mode);
 
         std::uint16_t width();
 

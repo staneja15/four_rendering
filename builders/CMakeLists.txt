@@ -9,7 +9,7 @@ add_library(
 target_include_directories(
     ${target}
     PUBLIC
-    ${PROJECT_SOURCE_DIR}
+    ${FR_ROOT_DIR}
 )
 
 target_link_libraries(

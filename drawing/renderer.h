@@ -2,11 +2,15 @@
 #include "builders/vulkan_structures.h"
 
 namespace fr {
+    struct RendererParams {
+        VkPolygonMode polygon_mode;
+    };
+
     class Renderer {
     public:
         Renderer(std::shared_ptr<VkContext>& context);
 
-        bool record_command_buffer(std::size_t vertices_size);
+        bool record_command_buffer(std::size_t vertices_size, const RendererParams& renderer_params);
 
         void present_image(std::uint32_t index);
 

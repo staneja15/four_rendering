@@ -9,5 +9,5 @@ add_library(
 target_include_directories(
     ${target}
     PRIVATE
-    ${PROJECT_SOURCE_DIR}
+    ${FR_ROOT_DIR}
 )

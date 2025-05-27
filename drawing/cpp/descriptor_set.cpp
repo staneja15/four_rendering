@@ -1,6 +1,8 @@
 #include "drawing/descriptor_set.h"
 #include "utils/error.h"
 
+#include <unordered_map>
+
 namespace fr {
     DescriptorSet::DescriptorSet(std::shared_ptr<VkContext>& context)
         : _context(context)

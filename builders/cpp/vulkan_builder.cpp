@@ -226,9 +226,14 @@ namespace fr {
             .dynamicRendering = VK_TRUE
         };
 
+        VkPhysicalDeviceFeatures enable_device_features {
+            .fillModeNonSolid = VK_TRUE
+        };
+
         VkPhysicalDeviceFeatures2 enable_device_features2 {
             .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
-            .pNext = &enable_vulkan13_features
+            .pNext = &enable_vulkan13_features,
+            .features = enable_device_features
         };
 
         // Create the logical device

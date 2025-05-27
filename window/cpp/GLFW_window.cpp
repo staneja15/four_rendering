@@ -37,9 +37,18 @@ namespace fr {
         window_instance->framebuffer_resized = true;
     }
 
-    void GLFWWindow::process_input(GLFWwindow *window) {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    void GLFWWindow::process_input(GLFWwindow *window, VkPolygonMode& polygon_mode) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, true);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) {
+            polygon_mode = VK_POLYGON_MODE_LINE;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
+            polygon_mode = VK_POLYGON_MODE_FILL;
+        }
 
         Camera::process_input(window);
     }

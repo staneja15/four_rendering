@@ -47,5 +47,13 @@ namespace fr {
                 memcpy(mapped_data, model, buffer_size);
             }
         };
+
+    struct FloatArray {
+        float* array = nullptr;
+
+        static void update(float* array_data, void* mapped_data, const std::size_t dynamic_alignment, const std::size_t buffer_size, const std::size_t n_components) {
+            memcpy(mapped_data, array_data, buffer_size);
+        }
+    };
     }
 }

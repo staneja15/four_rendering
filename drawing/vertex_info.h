@@ -42,6 +42,10 @@ namespace fr {
             add_attribute_description(VK_FORMAT_R32G32B32_SFLOAT, offset, binding);
         }
 
+        void add_attribute_description(const std::uint32_t& member, const std::uint32_t offset, const std::uint32_t binding) {
+            add_attribute_description(VK_FORMAT_R32_UINT, offset, binding);
+        }
+
         void add_binding_description(const std::uint32_t stride, const std::uint32_t binding) {
             binding_description.push_back(
                 VkVertexInputBindingDescription {

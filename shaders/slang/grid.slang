@@ -18,7 +18,7 @@ ConstantBuffer<ViewProj> vp;
 ConstantBuffer<Model> model;
 
 [shader("vertex")]
-VSOutput vertex_main(float2 vertex_position) {
+VSOutput vertex_main(float2 vertex_position, uint32_t index) {
     VSOutput output = {};
 
     float4 world_position = mul(model.model, float4(vertex_position.x, 1.0, vertex_position.y, 1.0));  // vertex_position.y is used on the z axis as we have a 2D array of x and z positions as input.

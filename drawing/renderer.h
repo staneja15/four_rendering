@@ -10,7 +10,9 @@ namespace fr {
     public:
         Renderer(std::shared_ptr<VkContext>& context);
 
-        bool record_command_buffer(std::size_t vertices_size, const RendererParams& renderer_params);
+        void build_command_buffers(const RendererParams& renderer_params);
+
+        bool draw();
 
         void present_image(std::uint32_t index);
 

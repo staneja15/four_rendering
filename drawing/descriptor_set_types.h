@@ -21,39 +21,4 @@ namespace fr {
             memcpy(mapped_data, &vp, sizeof(vp));
         }
     };
-
-    namespace dynamic {
-        /// Creates a line of model matrices along the x-axis, intended for use with dynamic buffers
-        struct Model {
-            glm::mat4* model = nullptr;
-
-            static void update(void* mapped_data, const std::size_t dynamic_alignment, const std::size_t buffer_size, const std::size_t n_components) {
-                if (buffer_size % dynamic_alignment != 0) {
-                    throw std::runtime_error("Buffer size must be a multiple of dynamic alignment.");
-                }
-
-                // Allocate and align the data
-                void* data = nullptr;
-                posix_memalign(&data, dynamic_alignment, buffer_size);
-
-                auto [model] = Model {};
-                model = static_cast<glm::mat4*>(data);
-
-                for (int i = 0; i < n_components; ++i) {
-                    auto model_mat = reinterpret_cast<glm::mat4*>(reinterpret_cast<uint64_t>(model) + (i * dynamic_alignment));
-                    *model_mat = glm::translate(glm::mat4(1.0f), glm::vec3(2.0f * static_cast<float>(i), 0.0f, 0.0f));
-                }
-
-                memcpy(mapped_data, model, buffer_size);
-            }
-        };
-
-    struct FloatArray {
-        float* array = nullptr;
-
-        static void update(float* array_data, void* mapped_data, const std::size_t dynamic_alignment, const std::size_t buffer_size, const std::size_t n_components) {
-            memcpy(mapped_data, array_data, buffer_size);
-        }
-    };
-    }
 }

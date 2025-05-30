@@ -46,12 +46,12 @@ struct DescriptorCore {
 	VkDescriptorSetLayout layout                = VK_NULL_HANDLE;
 	VkDescriptorSet descriptor                  = VK_NULL_HANDLE;
 	BufferCore uniform_buffer                   ;
-	BufferCore dynamic_buffer                   ;
+	BufferCore storage_buffer                   ;
 
 	explicit DescriptorCore(VkDevice* device_in)
 		: device(device_in)
 		, uniform_buffer(BufferCore(device_in))
-		, dynamic_buffer(BufferCore(device_in))
+		, storage_buffer(BufferCore(device_in))
 	{ }
 
 	~DescriptorCore() {
@@ -70,7 +70,7 @@ struct DescriptorCore {
 		}
 
 		uniform_buffer.destroy();
-		dynamic_buffer.destroy();
+		storage_buffer.destroy();
 	}
 };
 

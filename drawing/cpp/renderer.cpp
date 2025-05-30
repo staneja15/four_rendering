@@ -98,12 +98,9 @@ namespace fr {
             vkCmdBindIndexBuffer(_context->per_frame[frame].primary_command_buffer, _context->indices_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 
-            for (int i = 0; i < _context->descriptor.dynamic_buffer.n_buffers; ++i) {
-                auto dynamic_offset = i * static_cast<std::uint32_t>(_context->descriptor.dynamic_buffer.dynamic_alignment);
-                vkCmdBindDescriptorSets(_context->per_frame[frame].primary_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->descriptor.descriptor, 1, &dynamic_offset);
+            vkCmdBindDescriptorSets(_context->per_frame[frame].primary_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->descriptor.descriptor, 0, nullptr);
 
-                vkCmdDrawIndexed(_context->per_frame[frame].primary_command_buffer, _context->indices_buffer.count, 1, 0, 0, 0);
-            }
+            vkCmdDrawIndexed(_context->per_frame[frame].primary_command_buffer, _context->indices_buffer.count, 1, 0, 0, 0);
 
             // Complete rendering
             vkCmdEndRendering(_context->per_frame[frame].primary_command_buffer);

@@ -27,7 +27,7 @@ target_link_libraries(
 target_include_directories(
     four_rendering
     INTERFACE
-    ${FR_ROOT_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_subdirectory(builders)
@@ -53,7 +53,7 @@ target_link_libraries(
 target_include_directories(
     four_rendering_run
     PUBLIC
-    ${FR_ROOT_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 add_library(four::rendering ALIAS four_rendering)

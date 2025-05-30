@@ -1,4 +1,4 @@
-#include "window/GLFW_window.h"
+#include "GLFW_window.h"
 #include "camera/camera.h"
 
 #include <iostream>

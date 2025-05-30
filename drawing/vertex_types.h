@@ -1,6 +1,9 @@
 #pragma once
 
 #include "vertex_info.h"
+#include "descriptor_set_types.h"
+
+#include <cstdlib>
 
 #include <glm/glm.hpp>
 
@@ -16,23 +19,46 @@ namespace fr {
             vertex_info.add_attribute_description(color, offsetof(HelloTriangleVertex, color), binding);
 
             // Make the binding descriptions
-            vertex_info.add_binding_description(sizeof(HelloTriangleVertex), binding);
+            vertex_info.add_binding_description(sizeof(HelloTriangleVertex), binding, VK_VERTEX_INPUT_RATE_VERTEX);
 
             vertex_info.generate_vertex_info();  // update the vertex info
         }
     };
 
-    struct Grid2D {
-        glm::vec2 position;
-        std::uint32_t index;
 
-        void generate_vertex_info(VertexInfo& vertex_info, const std::uint32_t binding) const {
-            // Make the attribute descriptions
-            vertex_info.add_attribute_description(position, offsetof(Grid2D, position), binding);
-            vertex_info.add_attribute_description(index, offsetof(Grid2D, index), binding);
+    namespace Grid2D {
+        struct Vertex {
+            glm::vec2 position;
+            std::uint32_t index;
+        };
 
-            // Make the binding descriptions
-            vertex_info.add_binding_description(sizeof(Grid2D), binding);
+        struct InstanceData {
+            glm::mat4 model;
+            glm::vec3 color;
+
+            explicit InstanceData(const glm::mat4& model_in)
+                : model(model_in)
+            {
+                color = {pick_random_color_value(), pick_random_color_value(), pick_random_color_value()};
+            }
+
+            static float pick_random_color_value() {
+                return (float)(rand() % 100) / 100;
+            }
+        };
+
+        void inline generate_vertex_info(VertexInfo& vertex_info) {
+            // Vertex data
+            const auto [position, index] = Vertex {};
+            vertex_info.add_attribute_description(position, offsetof(Vertex, position), 0);
+            vertex_info.add_attribute_description(index, offsetof(Vertex, index), 0);
+            vertex_info.add_binding_description(sizeof(Vertex), 0, VK_VERTEX_INPUT_RATE_VERTEX);
+
+            // Instanced data
+            const auto [model, color] = InstanceData(glm::mat4(0));
+            vertex_info.add_attribute_description(model, offsetof(InstanceData, model), 1);
+            vertex_info.add_attribute_description(color, offsetof(InstanceData, color), 1);
+            vertex_info.add_binding_description(sizeof(InstanceData), 1, VK_VERTEX_INPUT_RATE_INSTANCE);
 
             vertex_info.generate_vertex_info();  // update the vertex info
         }
@@ -41,14 +67,14 @@ namespace fr {
         /// origin:    Bottom left corner of the grid
         /// width:     Number of units along the x and z axes
         /// unit_size: Width of each unit within the grid
-        static std::vector<Grid2D> generate_vertices(const glm::vec2 origin, const std::uint32_t width, const float unit_size) {
-            std::vector<Grid2D> grid = {};
+        static std::vector<Vertex> generate_vertices(const glm::vec2 origin, const std::uint32_t width, const float unit_size) {
+            std::vector<Vertex> grid = {};
             const std::uint32_t n_positions = width * width;
             grid.reserve(n_positions);
 
             for (int i = 0; i < width; ++i) {
                 for (int j = 0; j < width; ++j) {
-                    auto curr_grid = Grid2D {
+                    auto curr_grid = Vertex {
                         .position = {
                             origin.x + (static_cast<float>(i) * unit_size),
                             origin.y - (static_cast<float>(j) * unit_size)
@@ -62,6 +88,11 @@ namespace fr {
             return grid;
         }
 
+        /// Checks if a given position lies on the right edge of a grid
+        static bool is_right_edge(const std::uint32_t position, const std::uint32_t width) {
+            return position % width == width - 1;
+        }
+
         /// Generates the index positions for a grid with a given width
         static std::vector<std::uint32_t> generate_indices(const std::uint32_t width) {
             const std::uint32_t n_positions = width * width;
@@ -71,7 +102,7 @@ namespace fr {
 
             std::uint32_t final_row = n_positions - width;
             for (std::uint32_t i = 0; i < n_positions; ++i) {
-                if (i >= final_row || _is_right_edge(i, width)) {
+                if (i >= final_row || is_right_edge(i, width)) {
                     continue;
                 }
 
@@ -87,12 +118,6 @@ namespace fr {
             }
 
             return indices;
-        }
-
-    private:
-        /// Checks if a given position lies on the right edge of a grid
-        static bool _is_right_edge(const std::uint32_t position, const std::uint32_t width) {
-            return position % width == width - 1;
         }
     };
 }

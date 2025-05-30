@@ -21,4 +21,26 @@ namespace fr {
             memcpy(mapped_data, &vp, sizeof(vp));
         }
     };
+
+    struct StorageBufferInfo {
+        std::uint32_t size;
+    };
+
+    struct FloatArray {
+        std::vector<float> data;
+
+        explicit FloatArray(const std::vector<float>& data_in)
+            : data(data_in)
+        { }
+
+        [[nodiscard]] StorageBufferInfo get_storage_buffer_info() const {
+            return StorageBufferInfo {
+                .size = static_cast<std::uint32_t>(data.size())
+            };
+        }
+
+        [[nodiscard]] std::uint32_t size() const {
+            return sizeof(std::uint32_t) + sizeof(float) * data.size();
+        }
+    };
 }

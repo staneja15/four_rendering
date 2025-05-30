@@ -46,12 +46,19 @@ namespace fr {
             add_attribute_description(VK_FORMAT_R32_UINT, offset, binding);
         }
 
-        void add_binding_description(const std::uint32_t stride, const std::uint32_t binding) {
+        void add_attribute_description(const glm::mat4& member, const std::uint32_t offset, const std::uint32_t binding) {
+            add_attribute_description(VK_FORMAT_R32G32B32A32_SFLOAT, offset + sizeof(glm::vec4) * 0, binding);
+            add_attribute_description(VK_FORMAT_R32G32B32A32_SFLOAT, offset + sizeof(glm::vec4) * 1, binding);
+            add_attribute_description(VK_FORMAT_R32G32B32A32_SFLOAT, offset + sizeof(glm::vec4) * 2, binding);
+            add_attribute_description(VK_FORMAT_R32G32B32A32_SFLOAT, offset + sizeof(glm::vec4) * 3, binding);
+        }
+
+        void add_binding_description(const std::uint32_t stride, const std::uint32_t binding, VkVertexInputRate input_rate) {
             binding_description.push_back(
                 VkVertexInputBindingDescription {
                     .binding = binding,
                     .stride = stride,
-                    .inputRate = VK_VERTEX_INPUT_RATE_VERTEX
+                    .inputRate = input_rate
                 }
             );
         }

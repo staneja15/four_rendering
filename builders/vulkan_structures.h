@@ -47,11 +47,13 @@ struct DescriptorCore {
 	VkDescriptorSet descriptor                  = VK_NULL_HANDLE;
 	BufferCore uniform_buffer                   ;
 	BufferCore storage_buffer                   ;
+	BufferCore storage_buffer_info              ;
 
 	explicit DescriptorCore(VkDevice* device_in)
 		: device(device_in)
 		, uniform_buffer(BufferCore(device_in))
 		, storage_buffer(BufferCore(device_in))
+		, storage_buffer_info(BufferCore(device_in))
 	{ }
 
 	~DescriptorCore() {
@@ -71,6 +73,7 @@ struct DescriptorCore {
 
 		uniform_buffer.destroy();
 		storage_buffer.destroy();
+		storage_buffer_info.destroy();
 	}
 };
 
@@ -166,6 +169,11 @@ struct VkContext {
 	/// The buffer object that holds the indices data and memory for the triangle.
 	BufferCore indices_buffer = BufferCore(&device);
 
+	/// The buffer object that holds the instanced data
+	BufferCore instance_buffer = BufferCore(&device);
+	std::uint32_t instance_count = 0;
+
+
 	void teardown_per_frame(PerFrame& per_frame) {
 		if (per_frame.queue_submit_fence != VK_NULL_HANDLE) {
 			vkDestroyFence(device, per_frame.queue_submit_fence, nullptr);
@@ -213,6 +221,7 @@ struct VkContext {
 
 		vertex_buffer.destroy();
 		indices_buffer.destroy();
+		instance_buffer.destroy();
 
 		if (pipeline != VK_NULL_HANDLE) {
 			vkDestroyPipeline(device, pipeline, nullptr);

@@ -1,14 +1,11 @@
 #pragma once
 
 #include "vulkan_structures.h"
-#include "utils/global.h"
-#include "window/GLFW_window.h"
 
 #include <memory>
 
 #include <vulkan/vulkan_core.h>
-#include <vulkan/vulkan.h>
-#include <GLFW/glfw3.h>
+
 
 namespace fr {
     static VKAPI_ATTR VkBool32 VKAPI_CALL _debug_callback(

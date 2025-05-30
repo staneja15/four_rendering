@@ -1,6 +1,5 @@
-#include "drawing/renderer.h"
-#include "drawing/descriptor_set_types.h"
-#include "camera/camera.h"
+#include "renderer.h"
+#include "descriptor_set_types.h"
 #include "utils/error.h"
 
 #include <glm/glm.hpp>

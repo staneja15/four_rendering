@@ -1,4 +1,4 @@
-#include "drawing/descriptor_set.h"
+#include "descriptor_set.h"
 #include "utils/error.h"
 
 #include <unordered_map>

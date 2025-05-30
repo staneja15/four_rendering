@@ -1,4 +1,4 @@
-#include "drawing/graphics_pipeline.h"
+#include "graphics_pipeline.h"
 #include "utils/error.h"
 
 namespace fr {

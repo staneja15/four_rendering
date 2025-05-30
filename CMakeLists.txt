@@ -1,9 +1,11 @@
-set(FR_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
 # Find required packages
 find_package(Vulkan REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
+
+# Set global includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extern)
 
 # Setup the Project interface
 add_library(

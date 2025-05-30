@@ -9,7 +9,7 @@ add_library(
 target_include_directories(
     ${target}
     PRIVATE
-    ${FR_ROOT_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "drawing/vertex_info.h"
+#include "vertex_info.h"
 
 #include <glm/glm.hpp>
 

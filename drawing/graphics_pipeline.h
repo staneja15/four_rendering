@@ -1,7 +1,7 @@
 #pragma once
 
 #include "builders/vulkan_structures.h"
-#include "drawing/vertex_types.h"
+#include "vertex_types.h"
 
 #include <memory>
 

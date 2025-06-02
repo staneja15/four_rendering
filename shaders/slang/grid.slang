@@ -14,6 +14,9 @@ struct VSInput {
     [[vk::location(4)]] float4 transform2;
     [[vk::location(5)]] float4 transform3;
     [[vk::location(6)]] float3 instance_color;
+
+    // Shader draw data
+    uint instance_id : SV_InstanceID;
 }
 
 struct ViewProj {
@@ -36,7 +39,8 @@ ConstantBuffer<StorageBufferInfo> height_info;
 
 [shader("vertex")]
 VSOutput vertex_main(VSInput input) {
-    uint idx = min(input.index, height_info.MAX_ELEVATION_IDX);
+    uint instance_offset = 10000 * input.instance_id;
+    uint idx = min(input.index + instance_offset, height_info.MAX_ELEVATION_IDX);
     VSOutput output = {};
 
     float4x4 model = {
@@ -60,5 +64,5 @@ VSOutput vertex_main(VSInput input) {
 
 [shader("fragment")]
 float3 fragment_main(VSOutput input) {
-    return input.color;
+    return input.color * 0.3 + float3(0.01, 0.37, 0.19) * 0.7;
 }

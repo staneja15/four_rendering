@@ -72,14 +72,14 @@ namespace fr {
             const std::uint32_t n_positions = width * width;
             grid.reserve(n_positions);
 
-            for (int i = 0; i < width; ++i) {
-                for (int j = 0; j < width; ++j) {
+            for (int z = 0; z < width; ++z) {
+                for (int x = 0; x < width; ++x) {
                     auto curr_grid = Vertex {
                         .position = {
-                            origin.x + (static_cast<float>(i) * unit_size),
-                            origin.y - (static_cast<float>(j) * unit_size)
+                            origin.x + (static_cast<float>(x) * unit_size),
+                            origin.y - (static_cast<float>(z) * unit_size)
                         },
-                        .index = i * width + j
+                        .index = z * width + x
                     };
                     grid.emplace_back(curr_grid);
                 }

@@ -29,7 +29,6 @@ namespace fr {
     namespace Grid2D {
         struct Vertex {
             glm::vec2 position;
-            std::uint32_t index;
         };
 
         struct InstanceData {
@@ -49,9 +48,8 @@ namespace fr {
 
         void inline generate_vertex_info(VertexInfo& vertex_info) {
             // Vertex data
-            const auto [position, index] = Vertex {};
+            const auto [position] = Vertex {};
             vertex_info.add_attribute_description(position, offsetof(Vertex, position), 0);
-            vertex_info.add_attribute_description(index, offsetof(Vertex, index), 0);
             vertex_info.add_binding_description(sizeof(Vertex), 0, VK_VERTEX_INPUT_RATE_VERTEX);
 
             // Instanced data
@@ -78,8 +76,7 @@ namespace fr {
                         .position = {
                             origin.x + (static_cast<float>(x) * unit_size),
                             origin.y - (static_cast<float>(z) * unit_size)
-                        },
-                        .index = z * width + x
+                        }
                     };
                     grid.emplace_back(curr_grid);
                 }

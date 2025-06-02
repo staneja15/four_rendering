@@ -24,6 +24,7 @@ namespace fr {
 
     struct StorageBufferInfo {
         std::uint32_t size;
+        std::uint32_t instance_size;
     };
 
     struct FloatArray {
@@ -33,9 +34,10 @@ namespace fr {
             : data(data_in)
         { }
 
-        [[nodiscard]] StorageBufferInfo get_storage_buffer_info() const {
+        [[nodiscard]] StorageBufferInfo get_storage_buffer_info(const std::uint32_t instance_size_in) const {
             return StorageBufferInfo {
-                .size = static_cast<std::uint32_t>(data.size())
+                .size = static_cast<std::uint32_t>(data.size()),
+                .instance_size = instance_size_in
             };
         }
 

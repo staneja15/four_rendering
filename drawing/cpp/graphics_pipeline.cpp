@@ -64,8 +64,10 @@ namespace fr {
 
         // Disable depth testing
         VkPipelineDepthStencilStateCreateInfo depth_stencil {
-            .sType          = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-            .depthCompareOp = VK_COMPARE_OP_ALWAYS
+            .sType            = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+            .depthTestEnable  = VK_TRUE,
+            .depthWriteEnable = VK_TRUE,
+            .depthCompareOp   = VK_COMPARE_OP_LESS
         };
 
         // No multisampling.
@@ -85,7 +87,8 @@ namespace fr {
         VkPipelineRenderingCreateInfo pipeline_rendering_info {
             .sType                   = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO,
             .colorAttachmentCount    = 1,
-            .pColorAttachmentFormats = &_context->swap_chain_dimensions.format
+            .pColorAttachmentFormats = &_context->swap_chain_dimensions.format,
+            .depthAttachmentFormat   = _context->depth_format
         };
 
         // Create the graphics pipeline.

@@ -18,6 +18,7 @@ namespace fr {
         _create_device();
         _load_device_extensions();
         _create_swap_chain();
+        _create_depth_resources();
     }
 
     void VulkanBuilder::recreate_swap_chain() {
@@ -446,4 +447,74 @@ namespace fr {
 
     }
 
+    void VulkanBuilder::_create_depth_resources() {
+        // Create the depth image
+        _context->depth_format = VK_FORMAT_D24_UNORM_S8_UINT;
+
+        VkImageCreateInfo imageInfo{};
+        imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageInfo.imageType = VK_IMAGE_TYPE_2D;
+        imageInfo.extent.width = _context->swap_chain_dimensions.width;
+        imageInfo.extent.height = _context->swap_chain_dimensions.width;
+        imageInfo.extent.depth = 1;
+        imageInfo.mipLevels = 1;
+        imageInfo.arrayLayers = 1;
+        imageInfo.format = _context->depth_format;  // Note: for stencil testing, this format will need to change.
+        imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        imageInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+        validate(
+            vkCreateImage(_context->device, &imageInfo, nullptr, &_context->depth_image),
+            "Failed to create depth image."
+        );
+
+        // Allocate depth memory
+        VkMemoryRequirements memory_requirements;
+        vkGetImageMemoryRequirements(_context->device, _context->depth_image, &memory_requirements);
+
+        VkMemoryAllocateInfo allocInfo {};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memory_requirements.size;
+        allocInfo.memoryTypeIndex = _find_memory_type(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        validate(
+            vkAllocateMemory(_context->device, &allocInfo, nullptr, &_context->depth_image_memory),
+            "Failed to allocate depth image memory."
+        );
+
+        vkBindImageMemory(_context->device, _context->depth_image, _context->depth_image_memory, 0);
+
+        // Create the depth image view
+        VkImageViewCreateInfo view_info{};
+        view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_info.image = _context->depth_image;
+        view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_info.format = _context->depth_format;
+        view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+        view_info.subresourceRange.baseMipLevel = 0;
+        view_info.subresourceRange.levelCount = 1;
+        view_info.subresourceRange.baseArrayLayer = 0;
+        view_info.subresourceRange.layerCount = 1;
+
+        validate(
+            vkCreateImageView(_context->device, &view_info, nullptr, &_context->depth_image_view),
+            "Failed to create depth image view."
+        );
+    }
+
+    std::uint32_t VulkanBuilder::_find_memory_type(const uint32_t type_filter, VkMemoryPropertyFlags properties) const {
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(_context->gpu, &memProperties);
+
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+            if ((type_filter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("failed to find suitable memory type!");
+    }
 }  // namespace fr

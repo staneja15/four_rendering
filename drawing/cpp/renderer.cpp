@@ -29,10 +29,23 @@ namespace fr {
                 _context->swap_chain_images[frame],
                 VK_IMAGE_LAYOUT_UNDEFINED,
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                VK_IMAGE_ASPECT_COLOR_BIT,
                 0,                                                     // srcAccessMask (no need to wait for previous operations)
                 VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,                // dstAccessMask
                 VK_PIPELINE_STAGE_2_TOP_OF_PIPE_BIT,                   // srcStage
                 VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT        // dstStage
+            );
+
+            _transition_image_layout(
+                _context->per_frame[frame].primary_command_buffer,
+                _context->depth_image,
+                VK_IMAGE_LAYOUT_UNDEFINED,
+                VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT,
+                0,
+                VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+                VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+                VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT
             );
 
             // Set clear color values.
@@ -50,6 +63,15 @@ namespace fr {
                 .clearValue  = clear_value
             };
 
+            VkRenderingAttachmentInfo depth_attachment {
+                .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO,
+                .imageView = _context->depth_image_view,
+                .imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+                .loadOp      = VK_ATTACHMENT_LOAD_OP_CLEAR,
+                .storeOp     = VK_ATTACHMENT_STORE_OP_STORE,
+                .clearValue  = {1.0f, 0}
+            };
+
             // Begin rendering
             VkRenderingInfo rendering_info {
                 .sType                = VK_STRUCTURE_TYPE_RENDERING_INFO_KHR,
@@ -61,7 +83,8 @@ namespace fr {
                 },
             .layerCount = 1,
             .colorAttachmentCount = 1,
-            .pColorAttachments    = &color_attachment
+            .pColorAttachments    = &color_attachment,
+            .pDepthAttachment     = &depth_attachment
         };
 
             vkCmdBeginRendering(_context->per_frame[frame].primary_command_buffer, &rendering_info);
@@ -70,7 +93,6 @@ namespace fr {
             vkCmdBindPipeline(_context->per_frame[frame].primary_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline);
 
             // Set the dynamic states (defined in the pipeline creation)
-
             VkViewport vp {
                 .width    = static_cast<float>(_context->swap_chain_dimensions.width),
                 .height   = static_cast<float>(_context->swap_chain_dimensions.height),
@@ -111,6 +133,7 @@ namespace fr {
                 _context->swap_chain_images[frame],
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                 VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+                VK_IMAGE_ASPECT_COLOR_BIT,
                 VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,                 // srcAccessMask
                 0,                                                      // dstAccessMask
                 VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,        // srcStage
@@ -225,25 +248,26 @@ namespace fr {
     void Renderer::_transition_image_layout(
         VkCommandBuffer cmd,
         VkImage image,
-        VkImageLayout oldLayout,
-        VkImageLayout newLayout,
-        VkAccessFlags2 srcAccessMask,
-        VkAccessFlags2 dstAccessMask,
-        VkPipelineStageFlags2 srcStage,
-        VkPipelineStageFlags2 dstStage
+        VkImageLayout old_layout,
+        VkImageLayout new_layout,
+        VkImageAspectFlags image_flag_bits,
+        VkAccessFlags2 src_access_mask,
+        VkAccessFlags2 dst_access_mask,
+        VkPipelineStageFlags2 src_stage,
+        VkPipelineStageFlags2 dst_stage
     ) {
         VkImageMemoryBarrier2 image_barrier {
             .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
 
             // Specify the pipeline stages and access masks for the barrier
-            .srcStageMask  = srcStage,             // Source pipeline stage mask
-            .srcAccessMask = srcAccessMask,        // Source access mask
-            .dstStageMask  = dstStage,             // Destination pipeline stage mask
-            .dstAccessMask = dstAccessMask,        // Destination access mask
+            .srcStageMask  = src_stage,             // Source pipeline stage mask
+            .srcAccessMask = src_access_mask,        // Source access mask
+            .dstStageMask  = dst_stage,             // Destination pipeline stage mask
+            .dstAccessMask = dst_access_mask,        // Destination access mask
 
             // Specify the old and new layouts of the image
-            .oldLayout = oldLayout,        // Current layout of the image
-            .newLayout = newLayout,        // Target layout of the image
+            .oldLayout = old_layout,        // Current layout of the image
+            .newLayout = new_layout,        // Target layout of the image
 
             // We are not changing the ownership between queues
             .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
@@ -254,7 +278,7 @@ namespace fr {
 
             // Define the subresource range (which parts of the image are affected)
             .subresourceRange = {
-                .aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT,        // Affects the color aspect of the image
+                .aspectMask     = image_flag_bits,        // Affects the color aspect of the image
                 .baseMipLevel   = 0,                                // Start at mip level 0
                 .levelCount     = 1,                                // Number of mip levels affected
                 .baseArrayLayer = 0,                                // Start at array layer 0

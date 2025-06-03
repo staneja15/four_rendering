@@ -50,5 +50,9 @@ namespace fr {
         void _init_per_frame(PerFrame& per_frame);
 
         void _create_swap_chain();
+
+        void _create_depth_resources();
+
+        std::uint32_t _find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties) const;
     };
 } // namespace fr

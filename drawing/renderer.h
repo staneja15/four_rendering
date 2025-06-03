@@ -24,12 +24,13 @@ namespace fr {
         void _transition_image_layout(
             VkCommandBuffer       cmd,
             VkImage               image,
-            VkImageLayout         oldLayout,
-            VkImageLayout         newLayout,
-            VkAccessFlags2        srcAccessMask,
-            VkAccessFlags2        dstAccessMask,
-            VkPipelineStageFlags2 srcStage,
-            VkPipelineStageFlags2 dstStage
+            VkImageLayout         old_layout,
+            VkImageLayout         new_layout,
+            VkImageAspectFlags image_flag_bits,
+            VkAccessFlags2        src_access_mask,
+            VkAccessFlags2        dst_access_mask,
+            VkPipelineStageFlags2 src_stage,
+            VkPipelineStageFlags2 dst_stage
         );
 
         bool _resize();

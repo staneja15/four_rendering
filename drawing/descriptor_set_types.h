@@ -13,8 +13,8 @@ namespace fr {
         /// Updates the VP model with the Camera's perspective
         static void update(void* mapped_data, const SwapChainDimensions& swap_chain_dimensions) {
             auto vp = ViewProj {
-                .view  = Camera::get_camera_view(),
-                .proj  = glm::perspective(glm::radians(45.0f), static_cast<float>(swap_chain_dimensions.width) / static_cast<float>(swap_chain_dimensions.height), 0.1f, 1000.0f)
+                .view     = Camera::get_camera_view(),
+                .proj     = glm::perspective(glm::radians(45.0f), static_cast<float>(swap_chain_dimensions.width) / static_cast<float>(swap_chain_dimensions.height), 0.1f, 2000.0f),
             };
             vp.proj[1][1] *= -1;
 
@@ -25,6 +25,7 @@ namespace fr {
     struct StorageBufferInfo {
         std::uint32_t size;
         std::uint32_t instance_size;
+        float d;  // Distance between height indexes
     };
 
     struct FloatArray {
@@ -34,10 +35,11 @@ namespace fr {
             : data(data_in)
         { }
 
-        [[nodiscard]] StorageBufferInfo get_storage_buffer_info(const std::uint32_t instance_size_in) const {
+        [[nodiscard]] StorageBufferInfo get_storage_buffer_info(const std::uint32_t instance_size_in, float d_in) const {
             return StorageBufferInfo {
                 .size = static_cast<std::uint32_t>(data.size()),
-                .instance_size = instance_size_in
+                .instance_size = instance_size_in,
+                .d = d_in
             };
         }
 

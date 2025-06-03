@@ -142,6 +142,12 @@ struct VkContext {
     /// The handles to the images in the swap chain.
     std::vector<VkImage> swap_chain_images;
 
+	/// Depth buffer resources
+	VkImage depth_image;
+	VkDeviceMemory depth_image_memory;
+	VkImageView depth_image_view;
+	VkFormat depth_format;
+
     /// The graphics pipeline.
     VkPipeline pipeline = VK_NULL_HANDLE;
 
@@ -235,6 +241,18 @@ struct VkContext {
 
 		for (auto& image_view : swap_chain_image_views) {
 			vkDestroyImageView(device, image_view, nullptr);
+		}
+
+		if (depth_image != VK_NULL_HANDLE) {
+			vkDestroyImage(device, depth_image, nullptr);
+		}
+
+		if (depth_image_view != VK_NULL_HANDLE) {
+			vkDestroyImageView(device, depth_image_view, nullptr);
+		}
+
+		if (depth_image_memory != VK_NULL_HANDLE) {
+			vkFreeMemory(device, depth_image_memory, nullptr);
 		}
 
 		for (auto& per_frame : per_frame) {

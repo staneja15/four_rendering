@@ -48,8 +48,8 @@ float3 calculate_normal(float3 p1, float3 p2, float3 p3) {
     //  https://math.stackexchange.com/questions/2461485/find-a-normal-vector-using-cross-product
 
     float3 U = p2 - p1;
-    float3 V = p3 - p2;
-    return normalize(U * V);
+    float3 V = p3 - p1;
+    return normalize(cross(U, V));
 }
 
 [shader("vertex")]

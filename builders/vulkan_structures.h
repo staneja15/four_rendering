@@ -6,20 +6,20 @@
 #include <vector>
 #include <memory>
 
-#include <vulkan/vulkan.h>
+#include "vk_mem_alloc.h"
 
 struct BufferCore {
 	VkDevice* device              = VK_NULL_HANDLE;
+	VmaAllocator* allocator       = VK_NULL_HANDLE;
+	VmaAllocation allocation      = VK_NULL_HANDLE;
 	VkBuffer  buffer              = VK_NULL_HANDLE;
-	VkDeviceMemory buffer_memory  = VK_NULL_HANDLE;
 	std::uint32_t count           = 0;
 	std::size_t size              = 0;
-	std::size_t dynamic_alignment = 0;
 	std::size_t n_buffers         = 0;
-	void* data                    = nullptr;
 
-	explicit BufferCore(VkDevice* device_in)
+	explicit BufferCore(VkDevice* device_in, VmaAllocator* allocator_in)
 		: device(device_in)
+		, allocator(allocator_in)
 	{ }
 
 	~BufferCore() {
@@ -32,9 +32,8 @@ struct BufferCore {
 			buffer = VK_NULL_HANDLE;
 		}
 
-		if (buffer_memory != VK_NULL_HANDLE) {
-			vkFreeMemory(*device, buffer_memory, nullptr);
-			buffer_memory = VK_NULL_HANDLE;
+		if (allocation != VK_NULL_HANDLE) {
+			vmaDestroyBuffer(*allocator, buffer, allocation);
 		}
 	}
 };
@@ -45,15 +44,17 @@ struct DescriptorCore {
 	std::uint32_t pool_size                     =  0;
 	VkDescriptorSetLayout layout                = VK_NULL_HANDLE;
 	VkDescriptorSet descriptor                  = VK_NULL_HANDLE;
+	VmaAllocator* allocator						= VK_NULL_HANDLE;
 	BufferCore uniform_buffer                   ;
 	BufferCore storage_buffer                   ;
 	BufferCore storage_buffer_info              ;
 
-	explicit DescriptorCore(VkDevice* device_in)
+	explicit DescriptorCore(VkDevice* device_in, VmaAllocator* allocator_in)
 		: device(device_in)
-		, uniform_buffer(BufferCore(device_in))
-		, storage_buffer(BufferCore(device_in))
-		, storage_buffer_info(BufferCore(device_in))
+		, allocator(allocator_in)
+		, uniform_buffer(BufferCore(device_in, allocator))
+		, storage_buffer(BufferCore(device_in, allocator))
+		, storage_buffer_info(BufferCore(device_in, allocator))
 	{ }
 
 	~DescriptorCore() {
@@ -121,6 +122,9 @@ struct VkContext {
     /// The Vulkan device.
     VkDevice device = VK_NULL_HANDLE;
 
+	/// The VMA Allocator
+	VmaAllocator allocator = VK_NULL_HANDLE;
+
     /// The Vulkan device queue.
     VkQueue queue = VK_NULL_HANDLE;
 
@@ -144,7 +148,7 @@ struct VkContext {
 
 	/// Depth buffer resources
 	VkImage depth_image;
-	VkDeviceMemory depth_image_memory;
+	VmaAllocation depth_allocation;
 	VkImageView depth_image_view;
 	VkFormat depth_format;
 
@@ -167,16 +171,16 @@ struct VkContext {
     std::vector<PerFrame> per_frame;
 
 	/// The descriptor object that holds the Model/View/Projection data.
-	DescriptorCore descriptor = DescriptorCore(&device);
+	DescriptorCore descriptor = DescriptorCore(&device, &allocator);
 
     /// The buffer object that holds the vertex data and memory for the triangle.
-    BufferCore vertex_buffer = BufferCore(&device);
+    BufferCore vertex_buffer = BufferCore(&device, &allocator);
 
 	/// The buffer object that holds the indices data and memory for the triangle.
-	BufferCore indices_buffer = BufferCore(&device);
+	BufferCore indices_buffer = BufferCore(&device, &allocator);
 
 	/// The buffer object that holds the instanced data
-	BufferCore instance_buffer = BufferCore(&device);
+	BufferCore instance_buffer = BufferCore(&device, &allocator);
 	std::uint32_t instance_count = 0;
 
 
@@ -243,16 +247,12 @@ struct VkContext {
 			vkDestroyImageView(device, image_view, nullptr);
 		}
 
-		if (depth_image != VK_NULL_HANDLE) {
-			vkDestroyImage(device, depth_image, nullptr);
-		}
-
 		if (depth_image_view != VK_NULL_HANDLE) {
 			vkDestroyImageView(device, depth_image_view, nullptr);
 		}
 
-		if (depth_image_memory != VK_NULL_HANDLE) {
-			vkFreeMemory(device, depth_image_memory, nullptr);
+		if (depth_allocation != VK_NULL_HANDLE) {
+			vmaDestroyImage(allocator, depth_image, depth_allocation);
 		}
 
 		for (auto& per_frame : per_frame) {
@@ -263,6 +263,10 @@ struct VkContext {
 		if (swap_chain != VK_NULL_HANDLE) {
 			vkDestroySwapchainKHR(device, swap_chain, nullptr);
 			swap_chain = VK_NULL_HANDLE;
+		}
+
+		if (allocator != VK_NULL_HANDLE) {
+			vmaDestroyAllocator(allocator);
 		}
 
 		if (device != VK_NULL_HANDLE) {

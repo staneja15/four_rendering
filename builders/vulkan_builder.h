@@ -1,11 +1,12 @@
 #pragma once
 
+#define VULKAN_VERSION VK_API_VERSION_1_3
+
 #include "vulkan_structures.h"
 
 #include <memory>
 
 #include <vulkan/vulkan_core.h>
-
 
 namespace fr {
     static VKAPI_ATTR VkBool32 VKAPI_CALL _debug_callback(
@@ -44,6 +45,8 @@ namespace fr {
         void _create_surface();
 
         void _create_device();
+
+        void _create_memory_allocator();
 
         void _load_device_extensions();
 

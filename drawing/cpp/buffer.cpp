@@ -1,67 +1,39 @@
 #include "buffer.h"
+#include "utils/error.h"
 
 #include <ranges>
-
-#include "utils/error.h"
 
 namespace fr {
     Buffer::Buffer(std::shared_ptr<VkContext>& context)
         : _context(context)
     { }
 
-    void Buffer::create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, const VkBufferUsageFlags usage, bool unmap) {
+    void Buffer::create_buffer(BufferCore& buffer, void* data, VkDeviceSize buffer_size, const VkBufferUsageFlags usage, bool unmap) {
         buffer.size = buffer_size;
-
         // Create the buffer
-        VkBufferCreateInfo vertex_buffer_info {
+        VkBufferCreateInfo buffer_info {
             .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .flags       = 0,
             .size        = buffer_size,
-            .usage       = usage,
-            .sharingMode = VK_SHARING_MODE_EXCLUSIVE
+            .usage       = usage
         };
-        validate(
-            vkCreateBuffer(_context->device, &vertex_buffer_info, nullptr, &buffer.buffer),
-            "Failed to create vertex buffer."
-        );
 
-        // Get memory requirements
-        VkMemoryRequirements memory_requirements;
-        vkGetBufferMemoryRequirements(_context->device, buffer.buffer, &memory_requirements);
-
-        // Allocate memory to the buffer
-        // todo: We should map this to device local memory
-        VkMemoryAllocateInfo alloc_info {
-            .sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-            .allocationSize  = memory_requirements.size,
-            .memoryTypeIndex = _find_memory_type(
-                _context->gpu,
-                memory_requirements.memoryTypeBits,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-            )
+        VmaAllocationCreateInfo alloc_info {
+            .flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+            .usage = VMA_MEMORY_USAGE_AUTO
         };
 
         validate(
-            vkAllocateMemory(_context->device, &alloc_info, nullptr, &buffer.buffer_memory),
-            "Failed to allocate vertex buffer memory."
+            vmaCreateBuffer(_context->allocator, &buffer_info, &alloc_info, &buffer.buffer, &buffer.allocation, nullptr),
+            "Failed to create VMA Buffer"
         );
 
-        // Bind the buffer with the allocated memory
-        validate(
-            vkBindBufferMemory(_context->device, buffer.buffer, buffer.buffer_memory, 0),
-            "Failed to bind vertex buffer memory."
-        );
+        vmaCopyMemoryToAllocation(_context->allocator, data, buffer.allocation, 0, buffer.size);
 
-        // Map the memory and copy the vertex data
-        validate(
-            vkMapMemory(_context->device, buffer.buffer_memory, 0, buffer_size, 0, &buffer.data),
-            "Failed to Map the vertex buffer memory."
-        );
-        memcpy(buffer.data, vertices, static_cast<std::size_t>(buffer_size));
-
-        if (unmap) {
-            vkUnmapMemory(_context->device, buffer.buffer_memory);
-        }
+        // vmaMapMemory(_context->allocator, allocation, &buffer.data);
+        // memcpy(buffer.data, data, buffer.size);
+        // if (unmap) {
+        //     vmaUnmapMemory(_context->allocator, allocation);
+        // }
     }
 
     std::size_t Buffer::calculate_dynamic_alignment(const std::size_t size) const {

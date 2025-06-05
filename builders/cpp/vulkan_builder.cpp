@@ -1,3 +1,5 @@
+#define VMA_IMPLEMENTATION
+
 #include "vulkan_builder.h"
 #include "utils/error.h"
 
@@ -16,6 +18,7 @@ namespace fr {
         _create_instance();
         _create_surface();
         _create_device();
+        _create_memory_allocator();
         _load_device_extensions();
         _create_swap_chain();
         _create_depth_resources();
@@ -146,7 +149,7 @@ namespace fr {
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(physical_device, &device_properties);
 
-            if (device_properties.apiVersion < VK_API_VERSION_1_3) {
+            if (device_properties.apiVersion < VULKAN_VERSION) {
                 std::cout << "Skipping physical device: does not support Vulkan 1.3\n";
                 continue;
             }
@@ -262,6 +265,20 @@ namespace fr {
         );
 
         vkGetDeviceQueue(_context->device, _context->graphics_queue_index, 0, &_context->queue);
+    }
+
+    void VulkanBuilder::_create_memory_allocator() {
+        VmaAllocatorCreateInfo allocator_create_info {
+            .physicalDevice = _context->gpu,
+            .device = _context->device,
+            .instance = _context->instance,
+            .vulkanApiVersion = VULKAN_VERSION
+        };
+
+        validate(
+            vmaCreateAllocator(&allocator_create_info, &_context->allocator),
+            "Failed to create VMA allocator."
+        );
     }
 
     void VulkanBuilder::_load_device_extensions() {
@@ -466,26 +483,14 @@ namespace fr {
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
+        VmaAllocationCreateInfo alloc_info  {
+            .usage = VMA_MEMORY_USAGE_AUTO
+        };
+
         validate(
-            vkCreateImage(_context->device, &imageInfo, nullptr, &_context->depth_image),
+            vmaCreateImage(_context->allocator, &imageInfo, &alloc_info, &_context->depth_image, &_context->depth_allocation, nullptr),
             "Failed to create depth image."
         );
-
-        // Allocate depth memory
-        VkMemoryRequirements memory_requirements;
-        vkGetImageMemoryRequirements(_context->device, _context->depth_image, &memory_requirements);
-
-        VkMemoryAllocateInfo allocInfo {};
-        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.allocationSize = memory_requirements.size;
-        allocInfo.memoryTypeIndex = _find_memory_type(memory_requirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-        validate(
-            vkAllocateMemory(_context->device, &allocInfo, nullptr, &_context->depth_image_memory),
-            "Failed to allocate depth image memory."
-        );
-
-        vkBindImageMemory(_context->device, _context->depth_image, _context->depth_image_memory, 0);
 
         // Create the depth image view
         VkImageViewCreateInfo view_info{};

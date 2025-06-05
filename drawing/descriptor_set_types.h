@@ -11,14 +11,14 @@ namespace fr {
         glm::mat4 proj;
 
         /// Updates the VP model with the Camera's perspective
-        static void update(void* mapped_data, const SwapChainDimensions& swap_chain_dimensions) {
+        static void update(VmaAllocator allocator, VmaAllocation allocation, const SwapChainDimensions& swap_chain_dimensions) {
             auto vp = ViewProj {
                 .view     = Camera::get_camera_view(),
                 .proj     = glm::perspective(glm::radians(45.0f), static_cast<float>(swap_chain_dimensions.width) / static_cast<float>(swap_chain_dimensions.height), 0.1f, 2000.0f),
             };
             vp.proj[1][1] *= -1;
 
-            memcpy(mapped_data, &vp, sizeof(vp));
+            vmaCopyMemoryToAllocation(allocator, &vp, allocation, 0, sizeof(vp));
         }
     };
 

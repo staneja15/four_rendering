@@ -134,10 +134,10 @@ namespace fr {
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
                 VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
                 VK_IMAGE_ASPECT_COLOR_BIT,
-                VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,                 // srcAccessMask
-                0,                                                      // dstAccessMask
-                VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,        // srcStage
-                VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT                  // dstStage
+                VK_ACCESS_2_COLOR_ATTACHMENT_WRITE_BIT,                   // srcAccessMask
+                0,                                                        // dstAccessMask
+                VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT,          // srcStage
+                VK_PIPELINE_STAGE_2_BOTTOM_OF_PIPE_BIT                    // dstStage
             );
 
             validate(

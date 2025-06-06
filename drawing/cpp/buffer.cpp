@@ -4,36 +4,31 @@
 #include <ranges>
 
 namespace fr {
-    Buffer::Buffer(std::shared_ptr<VkContext>& context)
+    Buffer::Buffer(const std::shared_ptr<VkContext>& context)
         : _context(context)
     { }
 
-    void Buffer::create_buffer(BufferCore& buffer, void* data, VkDeviceSize buffer_size, const VkBufferUsageFlags usage, bool unmap) {
-        buffer.size = buffer_size;
-        // Create the buffer
-        VkBufferCreateInfo buffer_info {
-            .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-            .size        = buffer_size,
-            .usage       = usage
-        };
+    void Buffer::create_buffer(BufferCore& buffer, void* data, VkDeviceSize buffer_size, const VkBufferUsageFlags usage) {
+        if (buffer.buffer == VK_NULL_HANDLE) {
+            // Create the buffer
+            buffer.size = buffer_size;
 
-        VmaAllocationCreateInfo alloc_info {
-            .flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
-            .usage = VMA_MEMORY_USAGE_AUTO
-        };
+            VkBufferCreateInfo buffer_info {
+                .sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+                .size        = buffer_size,
+                .usage       = usage
+            };
 
-        validate(
-            vmaCreateBuffer(_context->allocator, &buffer_info, &alloc_info, &buffer.buffer, &buffer.allocation, nullptr),
-            "Failed to create VMA Buffer"
-        );
+            VmaAllocationCreateInfo alloc_info {
+                .flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT,
+                .usage = VMA_MEMORY_USAGE_AUTO
+            };
 
-        vmaCopyMemoryToAllocation(_context->allocator, data, buffer.allocation, 0, buffer.size);
-
-        // vmaMapMemory(_context->allocator, allocation, &buffer.data);
-        // memcpy(buffer.data, data, buffer.size);
-        // if (unmap) {
-        //     vmaUnmapMemory(_context->allocator, allocation);
-        // }
+            validate(
+                vmaCreateBuffer(_context->allocator, &buffer_info, &alloc_info, &buffer.buffer, &buffer.allocation, nullptr),
+                "Failed to create VMA Buffer"
+            );
+        }
     }
 
     std::size_t Buffer::calculate_dynamic_alignment(const std::size_t size) const {

@@ -5,9 +5,9 @@
 namespace fr {
     class Buffer {
     public:
-        Buffer(std::shared_ptr<VkContext>& context);
+        Buffer(const std::shared_ptr<VkContext>& context);
 
-        void create_buffer(BufferCore& buffer, void* vertices, VkDeviceSize buffer_size, VkBufferUsageFlags usage, bool unmap);
+        void create_buffer(BufferCore& buffer, void* data, VkDeviceSize buffer_size, VkBufferUsageFlags usage);
 
         std::size_t calculate_dynamic_alignment(std::size_t size) const;
 

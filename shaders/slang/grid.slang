@@ -28,6 +28,7 @@ struct ViewProj {
 struct StorageBufferInfo {
     uint32_t MAX_ELEVATION_IDX;
     uint32_t INSTANCE_BUFFER_SIZE;
+    float height_modifier;
     float d;  // Distance between each height index (x, z)
 };
 
@@ -67,16 +68,16 @@ VSOutput vertex_main(VSInput input) {
     };
     model = transpose(model);
 
-    float4 world_position = mul(model, float4(input.vertex_position.x, height_data[idx], input.vertex_position.y, 1.0));  // vertex_position.y is used on the z axis as we have a 2D array of x and z positions as input.
+    float4 world_position = mul(model, float4(input.vertex_position.x, height_data[idx] / height_info.height_modifier, input.vertex_position.y, 1.0));  // vertex_position.y is used on the z axis as we have a 2D array of x and z positions as input.
     float4 view_position = mul(vp.view, world_position);
     float4 clip_space = mul(vp.proj, view_position);
 
     // Calculate normal
     float d = height_info.d;
     uint width = uint(sqrt(height_info.INSTANCE_BUFFER_SIZE));
-    float3 p1 = float3(input.vertex_position.x,     height_data[idx]      , input.vertex_position.y    );
-    float3 p2 = float3(input.vertex_position.x + d, height_data[idx+1]    , input.vertex_position.y    );
-    float3 p3 = float3(input.vertex_position.x    , height_data[idx+width], input.vertex_position.y + d);
+    float3 p1 = float3(input.vertex_position.x,     height_data[idx]       / height_info.height_modifier, input.vertex_position.y    );
+    float3 p2 = float3(input.vertex_position.x + d, height_data[idx+1]     / height_info.height_modifier, input.vertex_position.y    );
+    float3 p3 = float3(input.vertex_position.x    , height_data[idx+width] / height_info.height_modifier, input.vertex_position.y + d);
     float3 normal = calculate_normal(p1, p2, p3);
 
     // Bind the output data

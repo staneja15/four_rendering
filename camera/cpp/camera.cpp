@@ -5,14 +5,6 @@
 #include <glm/ext/matrix_transform.hpp>
 
 namespace fr {
-    glm::mat4 Camera::get_camera_view() {
-        return glm::lookAt(
-            camera_pos,
-            camera_pos + camera_front,
-            camera_up
-        );
-    }
-
     void Camera::process_input(GLFWwindow* window) {
         // Calculate speed independent of fps
         float current_frame = glfwGetTime();
@@ -81,5 +73,17 @@ namespace fr {
         _front.y = sin(glm::radians(_pitch));
         _front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
         camera_front = glm::normalize(_front);
+    }
+
+    glm::mat4 Camera::get_camera_view() {
+        return glm::lookAt(
+            camera_pos,
+            camera_pos + camera_front,
+            camera_up
+        );
+    }
+
+    void Camera::set_camera_pos(const glm::vec3& position) {
+        camera_pos = position;
     }
 }

@@ -9,8 +9,9 @@ namespace fr {
         std::uint32_t binding;
         std::size_t size;
         VkDescriptorBufferInfo buffer_info;
+        VkDescriptorImageInfo  image_info;
 
-        explicit DescriptorInfo(VkDescriptorType type_in, VkShaderStageFlags flags_in, std::uint32_t binding_in, std::size_t size_in, VkBuffer buffer, VkDeviceSize offset)
+        DescriptorInfo(VkDescriptorType type_in, VkShaderStageFlags flags_in, std::uint32_t binding_in, std::size_t size_in, VkBuffer buffer, VkDeviceSize offset)
             : type(type_in)
             , flags(flags_in)
             , binding(binding_in)
@@ -18,6 +19,14 @@ namespace fr {
         {
             create_buffer_info(buffer, offset, size);
         }
+
+        DescriptorInfo(VkDescriptorType type_in, VkShaderStageFlags flags_in, std::uint32_t binding_in, std::size_t size_in, VkDescriptorImageInfo image_info_in, VkDeviceSize offset)
+            : type(type_in)
+            , flags(flags_in)
+            , binding(binding_in)
+            , size(size_in)
+            , image_info(image_info_in)
+        { }
 
         void create_buffer_info(VkBuffer buffer, const VkDeviceSize offset, const std::size_t size) {
             buffer_info = VkDescriptorBufferInfo {
@@ -43,6 +52,8 @@ namespace fr {
         void set_descriptor_pool(VkDescriptorPool& descriptor_pool, std::vector<VkDescriptorPoolSize>& pool_sizes, std::uint32_t max_sets);
 
         VkWriteDescriptorSet create_descriptor_set(VkDescriptorSet& descriptor_set, VkDescriptorBufferInfo* buffer_info, VkDescriptorType type, std::uint32_t binding);
+
+        VkWriteDescriptorSet create_descriptor_set(VkDescriptorSet& descriptor_set, VkDescriptorImageInfo* image_info, VkDescriptorType type, std::uint32_t binding);
 
     private:
         std::shared_ptr<VkContext> _context;

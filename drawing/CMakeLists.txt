@@ -5,7 +5,6 @@ add_library(
     STATIC
     cpp/graphics_pipeline.cpp
     cpp/renderer.cpp
-    cpp/buffer.cpp
     cpp/descriptor_set.cpp
 )
 
@@ -19,4 +18,5 @@ target_link_libraries(
     ${target}
     PRIVATE
     camera
+    fr_utils
 )

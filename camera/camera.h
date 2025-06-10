@@ -6,8 +6,8 @@
 namespace fr {
     class Camera {
     public:
-        static inline float speed = 1000.0f;
-        static inline glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 0.1f);
+        static inline float speed = 5.0f;
+        static inline glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 1.0f);
         static inline glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
         static inline glm::vec3 camera_direction = glm::normalize(camera_pos - target); // z-axis
         static inline glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -16,6 +16,8 @@ namespace fr {
         static inline glm::vec3 camera_front = glm::vec3(0.0f, 0.0f, -1.0f);
 
         static void process_input(GLFWwindow* window);
+
+        static void set_camera_speed(float speed_in);
 
         static void mouse_callback(GLFWwindow *window, const double x_pos_in, const double y_pos_in);
 

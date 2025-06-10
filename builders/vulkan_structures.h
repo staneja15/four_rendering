@@ -28,12 +28,8 @@ struct BufferCore {
 
 	void destroy() {
 		if (buffer != VK_NULL_HANDLE) {
-			vkDestroyBuffer(*device, buffer, nullptr);
-			buffer = VK_NULL_HANDLE;
-		}
-
-		if (allocation != VK_NULL_HANDLE) {
 			vmaDestroyBuffer(*allocator, buffer, allocation);
+			buffer = VK_NULL_HANDLE;
 		}
 	}
 };
@@ -181,7 +177,7 @@ struct VkContext {
 
 	/// The buffer object that holds the instanced data
 	BufferCore instance_buffer = BufferCore(&device, &allocator);
-	std::uint32_t instance_count = 0;
+	std::uint32_t instance_count = 1;
 
 
 	void teardown_per_frame(PerFrame& per_frame) {

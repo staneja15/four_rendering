@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "descriptor_set_types.h"
 #include "utils/error.h"
+#include "utils/image_utils.h"
 
 #include <glm/glm.hpp>
 
@@ -24,7 +25,7 @@ namespace fr {
             );
 
             // transition the image to the COLOR_ATTACHMENT_OPTIMAL for drawing
-            _transition_image_layout(
+            image::transition_layout(
                 _context->per_frame[frame].primary_command_buffer,
                 _context->swap_chain_images[frame],
                 VK_IMAGE_LAYOUT_UNDEFINED,
@@ -36,7 +37,7 @@ namespace fr {
                 VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT        // dstStage
             );
 
-            _transition_image_layout(
+            image::transition_layout(
                 _context->per_frame[frame].primary_command_buffer,
                 _context->depth_image,
                 VK_IMAGE_LAYOUT_UNDEFINED,
@@ -117,8 +118,11 @@ namespace fr {
 
             VkDeviceSize offset = {0};
             vkCmdBindVertexBuffers(_context->per_frame[frame].primary_command_buffer, 0, 1, &_context->vertex_buffer.buffer, &offset);
-            vkCmdBindVertexBuffers(_context->per_frame[frame].primary_command_buffer, 1, 1, &_context->instance_buffer.buffer, &offset);
             vkCmdBindIndexBuffer(_context->per_frame[frame].primary_command_buffer, _context->indices_buffer.buffer, 0, VK_INDEX_TYPE_UINT32);
+
+            if (renderer_params.instance) {
+                vkCmdBindVertexBuffers(_context->per_frame[frame].primary_command_buffer, 1, 1, &_context->instance_buffer.buffer, &offset);
+            }
 
             vkCmdBindDescriptorSets(_context->per_frame[frame].primary_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _context->pipeline_layout, 0, 1, &_context->descriptor.descriptor, 0, nullptr);
 
@@ -128,7 +132,7 @@ namespace fr {
             vkCmdEndRendering(_context->per_frame[frame].primary_command_buffer);
 
             // After rendering, transition to the PRESENT_SRC layout
-            _transition_image_layout(
+            image::transition_layout(
                 _context->per_frame[frame].primary_command_buffer,
                 _context->swap_chain_images[frame],
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
@@ -245,59 +249,6 @@ namespace fr {
         return VK_SUCCESS;
     }
 
-    void Renderer::_transition_image_layout(
-        VkCommandBuffer cmd,
-        VkImage image,
-        VkImageLayout old_layout,
-        VkImageLayout new_layout,
-        VkImageAspectFlags image_flag_bits,
-        VkAccessFlags2 src_access_mask,
-        VkAccessFlags2 dst_access_mask,
-        VkPipelineStageFlags2 src_stage,
-        VkPipelineStageFlags2 dst_stage
-    ) {
-        VkImageMemoryBarrier2 image_barrier {
-            .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2,
-
-            // Specify the pipeline stages and access masks for the barrier
-            .srcStageMask  = src_stage,             // Source pipeline stage mask
-            .srcAccessMask = src_access_mask,        // Source access mask
-            .dstStageMask  = dst_stage,             // Destination pipeline stage mask
-            .dstAccessMask = dst_access_mask,        // Destination access mask
-
-            // Specify the old and new layouts of the image
-            .oldLayout = old_layout,        // Current layout of the image
-            .newLayout = new_layout,        // Target layout of the image
-
-            // We are not changing the ownership between queues
-            .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-            .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
-
-            // Specify the image to be affected by this barrier
-            .image = image,
-
-            // Define the subresource range (which parts of the image are affected)
-            .subresourceRange = {
-                .aspectMask     = image_flag_bits,        // Affects the color aspect of the image
-                .baseMipLevel   = 0,                                // Start at mip level 0
-                .levelCount     = 1,                                // Number of mip levels affected
-                .baseArrayLayer = 0,                                // Start at array layer 0
-                .layerCount     = 1                                 // Number of array layers affected
-            }
-        };
-
-        // Initialize the VkDependencyInfo structure
-        VkDependencyInfo dependency_info {
-            .sType                   = VK_STRUCTURE_TYPE_DEPENDENCY_INFO,
-            .dependencyFlags         = 0,                    // No special dependency flags
-            .imageMemoryBarrierCount = 1,                    // Number of image memory barriers
-            .pImageMemoryBarriers    = &image_barrier        // Pointer to the image memory barrier(s)
-        };
-
-        // Record the pipeline barrier into the command buffer
-        vkCmdPipelineBarrier2(cmd, &dependency_info);
-    }
-
     bool Renderer::_resize() {
         if (_context->device == VK_NULL_HANDLE) {
             return false;
@@ -316,8 +267,6 @@ namespace fr {
         }
 
         vkDeviceWaitIdle(_context->device);
-
-
         return true;
     }
 }

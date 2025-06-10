@@ -4,6 +4,9 @@ add_library(
     ${target}
     STATIC
     cpp/file_system.cpp
+    cpp/scoped_command_buffer.cpp
+    cpp/buffer_utils.cpp
+    cpp/image_utils.cpp
 )
 
 target_include_directories(

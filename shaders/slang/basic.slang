@@ -1,10 +1,7 @@
 struct VSOutput {
     float4 position : SV_Position;
     float3 color;
-};
-
-struct Model {
-    float4x4 model;
+    float2 UV : TEXCOORD0;
 };
 
 struct ViewProj {
@@ -16,24 +13,26 @@ struct ViewProj {
 ConstantBuffer<ViewProj> vp;
 
 [[vk::binding(1, 0)]]
-ConstantBuffer<Model> model;
+Sampler2D texture_color : register(t1);
 
 [shader("vertex")]
-VSOutput vertex_main(float2 vertex_position, float3 color) {
+VSOutput vertex_main(float2 vertex_position, float3 color, float2 UV) {
     VSOutput output = {};
 
-    float4 world_position = mul(model.model, float4(vertex_position, 1.0, 1.0));
-    // float4 world_position = float4(vertex_position, 1.0, 1.0);
+    float4 world_position = float4(vertex_position, -5.0, 1.0);  // Doesn't require a model mat here as it would just be a glm::mat4(1.0f) anyway.
     float4 view_position = mul(vp.view, world_position);
     float4 clip_space = mul(vp.proj, view_position);
 
     output.position = clip_space;
     output.color = color;
+    output.UV = UV;
     
     return output;
 }
 
 [shader("fragment")]
 float3 fragment_main(VSOutput input) {
-    return input.color;
+    float3 tex = texture_color.Sample(input.UV).xyz;
+    float3 final_color = lerp(tex, input.color, 0.3);
+    return final_color;
 }

@@ -1,6 +1,7 @@
 #define VMA_IMPLEMENTATION
 
 #include "vulkan_builder.h"
+#include "texture_loader.h"
 #include "utils/error.h"
 
 #include <iostream>
@@ -231,7 +232,8 @@ namespace fr {
         };
 
         VkPhysicalDeviceFeatures enable_device_features {
-            .fillModeNonSolid = VK_TRUE
+            .fillModeNonSolid = VK_TRUE,
+            .shaderResourceMinLod = VK_TRUE
         };
 
         VkPhysicalDeviceFeatures2 enable_device_features2 {
@@ -493,7 +495,7 @@ namespace fr {
         );
 
         // Create the depth image view
-        VkImageViewCreateInfo view_info{};
+        VkImageViewCreateInfo view_info {};
         view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         view_info.image = _context->depth_image;
         view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;

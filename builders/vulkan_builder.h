@@ -5,6 +5,7 @@
 #include "vulkan_structures.h"
 
 #include <memory>
+#include <filesystem>
 
 #include <vulkan/vulkan_core.h>
 

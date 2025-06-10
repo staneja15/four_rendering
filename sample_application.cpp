@@ -1,6 +1,7 @@
 #include "sample_application.h"
+
 #include "drawing/graphics_pipeline.h"
-#include "drawing/buffer.h"
+#include "utils/buffer_utils.h"
 #include "drawing/renderer.h"
 #include "drawing/descriptor_set.h"
 #include "drawing/descriptor_set_types.h"
@@ -8,6 +9,7 @@
 
 SampleApplication::SampleApplication()
     : _vulkan_builder(std::make_unique<fr::VulkanBuilder>())
+    , _texture(std::make_unique<fr::Texture>(_vulkan_builder->get_context()))
 { }
 
 void SampleApplication::init() {
@@ -41,32 +43,34 @@ void SampleApplication::set_uniforms() {
     };
     _context->indices_buffer.count = static_cast<std::uint32_t>(indices.size());
 
-    auto buffer = fr::Buffer(_context);
-    buffer.create_buffer(_context->vertex_buffer,  vertices.data(), sizeof(vertices[0]) * vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, true);
-    buffer.create_buffer(_context->indices_buffer, indices.data(),  sizeof(indices[0])  * indices.size(),  VK_BUFFER_USAGE_INDEX_BUFFER_BIT,  true);
+    auto buffer = fr::BufferUtils(_context);
+    buffer.create_buffer(_context->vertex_buffer,  sizeof(fr::HelloTriangleVertex) * vertices.size(), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+    buffer.create_buffer(_context->indices_buffer, sizeof(std::uint32_t)  * indices.size(),  VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+    vmaCopyMemoryToAllocation(_context->allocator, vertices.data(), _context->vertex_buffer.allocation, 0, sizeof(fr::HelloTriangleVertex) * vertices.size());
+    vmaCopyMemoryToAllocation(_context->allocator, indices.data(), _context->indices_buffer.allocation, 0, sizeof(std::uint32_t)  * indices.size());
 
     // Create descriptor sets
-    auto data = nullptr;  // Bind no data to begin with - we will update this in the main loop later.
-    _context->descriptor.dynamic_buffer.dynamic_alignment = buffer.calculate_dynamic_alignment(sizeof(glm::mat4));
-    _context->descriptor.dynamic_buffer.n_buffers = 3;
-    buffer.create_buffer(_context->descriptor.uniform_buffer, &data, sizeof(fr::ViewProj), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, false);
-    buffer.create_buffer(_context->descriptor.dynamic_buffer, &data, _context->descriptor.dynamic_buffer.dynamic_alignment * _context->descriptor.dynamic_buffer.n_buffers, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, false);
+    buffer.create_buffer(_context->descriptor.uniform_buffer, sizeof(fr::ViewProj), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT);
+
+    _texture->load("/opt/four_map_engine/four_rendering/assets/images/yak.jpg");
+    fr::TextureInfo texture_info = _texture->get_info();
+
 
     std::vector<fr::DescriptorInfo> infos = {
         fr::DescriptorInfo(
             VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
             VK_SHADER_STAGE_VERTEX_BIT,
             0,
-            sizeof(fr::ViewProj),
+            _context->descriptor.uniform_buffer.size,
             _context->descriptor.uniform_buffer.buffer,
             0
         ),
         fr::DescriptorInfo(
-            VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC,
-            VK_SHADER_STAGE_VERTEX_BIT,
+            VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            VK_SHADER_STAGE_FRAGMENT_BIT,
             1,
-            _context->descriptor.dynamic_buffer.dynamic_alignment,
-            _context->descriptor.dynamic_buffer.buffer,
+            texture_info.size,
+            texture_info.image_info,
             0
         )
     };
@@ -78,24 +82,30 @@ void SampleApplication::set_uniforms() {
 void SampleApplication::run() {
     // Initialise the renderer
     auto renderer = fr::Renderer(_context);
+    auto renderer_params = fr::RendererParams {
+        .instance = false,
+        .polygon_mode = VK_POLYGON_MODE_FILL
+    };
 
+    renderer.build_command_buffers(renderer_params);
+
+    bool rebuild_cmd_buffer = false;
     while (!glfwWindowShouldClose(_context->window->get_window())) {
         glfwPollEvents();
-        fr::GLFWWindow::process_input(_context->window->get_window());
+        rebuild_cmd_buffer = fr::GLFWWindow::process_input(_context->window->get_window(), renderer_params.polygon_mode);
 
-        auto res = renderer.record_command_buffer(vertices.size());
+        if (rebuild_cmd_buffer) {
+            renderer.build_command_buffers(renderer_params);
+        }
+
+        auto res = renderer.draw();
         if (!res) {
             _vulkan_builder->recreate_swap_chain();
-            renderer.record_command_buffer(vertices.size());
+            renderer.build_command_buffers(renderer_params);
+            renderer.draw();
         }
 
         // Update MVP descriptor set
-        fr::ViewProj::update(_context->descriptor.uniform_buffer.data, _context->swap_chain_dimensions);
-        fr::dynamic::Model::update(
-            _context->descriptor.dynamic_buffer.data,
-            _context->descriptor.dynamic_buffer.dynamic_alignment,
-            _context->descriptor.dynamic_buffer.size,
-            _context->descriptor.dynamic_buffer.n_buffers
-        );
+        fr::ViewProj::update(_context->allocator, _context->descriptor.uniform_buffer.allocation, _context->swap_chain_dimensions);
     }
 }

@@ -20,7 +20,7 @@ namespace fr {
 
 
         std::unordered_map<VkDescriptorType, std::uint16_t> type_info = {};
-        for (auto& [type, flags, binding, size, buffer_info] : info) {
+        for (auto& [type, flags, binding, size, buffer_info, image_info] : info) {
             layout_bindings.emplace_back(create_descriptor_layout(type, flags, binding));
 
             type_info[type]++;  // Aggregate the type information
@@ -45,8 +45,12 @@ namespace fr {
             "Failed to create descriptor set."
         );
 
-        for (auto& [type, flags, binding, size, buffer_info] : info) {
-            write_descriptor_sets.emplace_back(create_descriptor_set(core.descriptor, &buffer_info, type, binding));
+        for (auto& [type, flags, binding, size, buffer_info, image_info] : info) {
+            if (type != VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+                write_descriptor_sets.emplace_back(create_descriptor_set(core.descriptor, &buffer_info, type, binding));
+            } else {
+                write_descriptor_sets.emplace_back(create_descriptor_set(core.descriptor, &image_info, type, binding));
+            }
         }
 
         vkUpdateDescriptorSets(_context->device, write_descriptor_sets.size(), write_descriptor_sets.data(), 0, nullptr);
@@ -104,6 +108,20 @@ namespace fr {
             .descriptorCount = 1,
             .descriptorType = type,
             .pBufferInfo = buffer_info
+        };
+
+        return write_descriptor;
+    }
+
+    VkWriteDescriptorSet DescriptorSet::create_descriptor_set(VkDescriptorSet& descriptor_set, VkDescriptorImageInfo* image_info, VkDescriptorType type, std::uint32_t binding) {
+        VkWriteDescriptorSet write_descriptor {
+            .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+            .dstSet = descriptor_set,
+            .dstBinding = binding,
+            .dstArrayElement = 0,
+            .descriptorCount = 1,
+            .descriptorType = type,
+            .pImageInfo = image_info
         };
 
         return write_descriptor;

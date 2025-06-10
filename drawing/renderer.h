@@ -3,6 +3,7 @@
 
 namespace fr {
     struct RendererParams {
+        bool instance = false;  // If using instancing, set this to true.
         VkPolygonMode polygon_mode;
     };
 
@@ -20,18 +21,6 @@ namespace fr {
         std::shared_ptr<VkContext> _context;
 
         VkResult _acquire_next_swap_chain_image(std::uint32_t* image);
-
-        void _transition_image_layout(
-            VkCommandBuffer       cmd,
-            VkImage               image,
-            VkImageLayout         old_layout,
-            VkImageLayout         new_layout,
-            VkImageAspectFlags image_flag_bits,
-            VkAccessFlags2        src_access_mask,
-            VkAccessFlags2        dst_access_mask,
-            VkPipelineStageFlags2 src_stage,
-            VkPipelineStageFlags2 dst_stage
-        );
 
         bool _resize();
     };

@@ -37,6 +37,10 @@ namespace fr {
         }
     }
 
+    void Camera::set_camera_speed(const float speed_in) {
+        speed = speed_in;
+    }
+
     void Camera::mouse_callback(GLFWwindow *window, const double x_pos_in, const double y_pos_in) {
         if (!_track_mouse) {
             return;

@@ -2,18 +2,21 @@ struct VSOutput {
     float4 position : SV_Position;
     float3 color;
     float3 normal;
+    float2 UV;
 };
 
 struct VSInput {
     // Vertex data
     [[vk::location(0)]] float2 vertex_position;
+    [[vk::location(1)]] float2 UV;
     
     // Instance data
-    [[vk::location(1)]] float4 transform0;
-    [[vk::location(2)]] float4 transform1;  
-    [[vk::location(3)]] float4 transform2;
-    [[vk::location(4)]] float4 transform3;
-    [[vk::location(5)]] float3 instance_color;
+    [[vk::location(2)]] float4 transform0;
+    [[vk::location(3)]] float4 transform1;  
+    [[vk::location(4)]] float4 transform2;
+    [[vk::location(5)]] float4 transform3;
+    [[vk::location(6)]] float3 instance_color;
+    [[vk::location(7)]] float2 texture_offset;
 
     // Shader draw data
     uint instance_id : SV_InstanceID;
@@ -40,6 +43,9 @@ StructuredBuffer<float> height_data;
 
 [[vk::binding(2, 0)]]
 ConstantBuffer<StorageBufferInfo> height_info;
+
+[[vk::binding(3, 0)]]
+Sampler2D colour_map : register(t1);
 
 float3 calculate_normal(float3 p1, float3 p2, float3 p3) {
     // Calculate Normal Positions
@@ -85,22 +91,26 @@ VSOutput vertex_main(VSInput input) {
     output.position = clip_space;
     output.color = input.instance_color;
     output.normal = normal;
+    output.UV = input.UV + input.texture_offset;
 
     return output;
 }
 
 [shader("fragment")]
 float3 fragment_main(VSOutput input) {
+    float3 tex = colour_map.Sample(input.UV).xyz;
+    // tex = input.color;
     float3 light_dir = normalize(-float3(20.0f, 50, 20.0f));  // todo: This should be in a uniform buffer
 
     // Ambient
-    float3 ambient = 0.05f * input.color;
+    float3 ambient = 0.05f * tex;
 
     // Diffuse
     float3 light_diffuse = float3(0.8f);
     float diff = max(dot(input.normal, light_dir), 0.0);
-    float3 diffuse = light_diffuse * diff * input.color;
+    float3 diffuse = light_diffuse * diff * tex;
     
     float3 frag_color = ambient + diffuse;
+
     return frag_color;
 }
